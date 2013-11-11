@@ -25,7 +25,7 @@
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt-metadata</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>Metadata</name>
   
 

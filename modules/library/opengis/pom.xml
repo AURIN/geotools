@@ -25,7 +25,7 @@
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt-opengis</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>Open GIS Interfaces</name>
   
   <scm>

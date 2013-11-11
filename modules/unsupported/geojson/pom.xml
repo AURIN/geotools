@@ -24,7 +24,7 @@
   <!-- =========================================================== -->
     <groupId>org.geotools</groupId>
     <artifactId>gt-geojson</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>GeoJSON Support</name>
 
     <scm>
@@ -84,6 +84,27 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.4.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
+						<Export-Package>
+							org.geotools.geojson.*;version=${project.version}
+						</Export-Package>
+						<Require-Bundle>gt-api; version=${project.version}</Require-Bundle>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
     <profiles>
       <profile>
