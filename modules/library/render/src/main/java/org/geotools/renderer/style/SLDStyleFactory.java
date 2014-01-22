@@ -146,6 +146,12 @@ public class SLDStyleFactory {
 	/** This one is used as the observer object in image tracks */
 	private static final Canvas obs = new Canvas();
 
+	/**
+	 * The default size for Marks when a mark is used, but no size is provided (got from
+	 * the default size to be used for SVGs and other scalable graphics when no size is provided)
+	 */
+    public static final int DEFAULT_MARK_SIZE = 16;
+
 	static { // static block to populate the lookups
 		joinLookup.put("miter", new Integer(BasicStroke.JOIN_MITER));
 		joinLookup.put("bevel", new Integer(BasicStroke.JOIN_BEVEL));
@@ -654,7 +660,7 @@ public class SLDStyleFactory {
 				// in case of Mark we don't have a natural size, so we default
 				// to 16
 				if (size <= 0)
-					size = 16;
+					size = DEFAULT_MARK_SIZE;
 				ms2d.setSize(size);
 				ms2d.setRotation(rotation);
 				retval = ms2d;
@@ -1097,8 +1103,8 @@ public class SLDStyleFactory {
                 int extraY = margin[0] + margin[2];
                 int extraX = margin[1] + margin[3];
                 int type = image.getType() == 0 ? BufferedImage.TYPE_4BYTE_ABGR : image.getType();
-                BufferedImage imageWithMargin = new BufferedImage(image.getWidth() + extraY, image.getHeight() + extraX, type);
-                int tx = margin[3];
+                BufferedImage imageWithMargin = new BufferedImage(image.getWidth() + extraX, image.getHeight() + extraY, type);
+                int tx = margin[1];
                 int ty = margin[0];
                 AffineTransform at = AffineTransform.getTranslateInstance(tx, ty);
                 Graphics2D graphics = imageWithMargin.createGraphics();
