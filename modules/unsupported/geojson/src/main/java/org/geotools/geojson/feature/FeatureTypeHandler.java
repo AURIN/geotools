@@ -37,11 +37,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Obtains a complete feature type from GeoJSON by parsing beyond first feature
  * and finding attributes that did not appear in the first feature or had null
  * values.
- * 
+ *
  * If null values are encoded, parsing will stop when all data types are found.
  * In the worst case, all features will be parsed. If null values are not
  * encoded, all features will be parsed anyway.
- * 
+ *
  */
 public class FeatureTypeHandler extends DelegatingHandler<SimpleFeatureType>
     implements IContentHandler<SimpleFeatureType> {
@@ -154,9 +154,14 @@ public class FeatureTypeHandler extends DelegatingHandler<SimpleFeatureType>
             return false;
           }
         } else if (knownType != newType) {
-          throw new IllegalStateException("Found conflicting types "
-              + knownType.getSimpleName() + " and " + newType.getSimpleName()
-              + " for property " + currentProp);
+          if (!Number.class.isAssignableFrom(knownType)) {
+            throw new IllegalStateException("Found conflicting types "
+                + knownType.getSimpleName() + " and " + newType.getSimpleName()
+                + " for property " + currentProp);
+          }
+          if (newType == Double.class) {
+            propertyTypes.put(currentProp, Double.class);
+          }
         }
       }
     }
@@ -212,7 +217,9 @@ public class FeatureTypeHandler extends DelegatingHandler<SimpleFeatureType>
     typeBuilder.setName("feature");
     typeBuilder.setNamespaceURI("http://geotools.org");
 
-    typeBuilder.add(geom.getLocalName(), geom.getType().getBinding(), crs);
+    if (geom != null) {
+      typeBuilder.add(geom.getLocalName(), geom.getType().getBinding(), crs);
+    }
 
     if (propertyTypes != null) {
       Set<Entry<String, Class<?>>> entrySet = propertyTypes.entrySet();

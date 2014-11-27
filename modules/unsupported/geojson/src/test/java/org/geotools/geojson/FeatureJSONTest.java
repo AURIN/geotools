@@ -540,6 +540,50 @@ public class FeatureJSONTest extends GeoJSONTestSupport {
         assertEquals(strip(collectionText(false, true)), fjson.toString(collection()));
     }
 
+    public void testFeatureCollectionWithNonWGS84CRSWrite() throws Exception {
+        String json =
+            "{" +
+            "  'type': 'FeatureCollection'," +
+            "  'crs': {" +
+            "    'type': 'name'," +
+            "    'properties': {" +
+            "      'name': 'EPSG:3857'" +
+            "    }" +
+            "  }," +
+            "  'features': [" +
+            "    {" +
+            "      'type': 'Feature'," +
+            "      'geometry': {" +
+            "        'type': 'Point', " +
+            "        'coordinates': [2.003750834E7, 2.003750834E7]" +
+            "      }," +
+            "      'properties': {" +
+            "      }," +
+            "      'id': 'xyz.1'" +
+            "    }" +
+            "  ]" +
+            "}";
+
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.add("geom", Point.class, CRS.decode("EPSG:3857"));
+        tb.add("name", String.class);
+        tb.setName("xyz");
+        SimpleFeatureType schema = tb.buildFeatureType();
+
+        DefaultFeatureCollection fc = new DefaultFeatureCollection();
+
+        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(schema);
+        fb.add(new WKTReader().read("POINT(20037508.34 20037508.34)"));
+        fc.add(fb.buildFeature("xyz.1"));
+
+        FeatureJSON fj = new FeatureJSON();
+        fj.setEncodeFeatureCollectionCRS(true);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        fj.writeFeatureCollection(fc, os);
+
+        assertEquals(strip(json), os.toString());
+    }
+
     public void testFeatureCollectionWithCRSRead() throws Exception {
         String json = collectionText(true, true);
         FeatureCollection fcol = fjson.readFeatureCollection(strip(collectionText(true, true)));
@@ -603,7 +647,44 @@ public class FeatureJSONTest extends GeoJSONTestSupport {
         assertEquals(ftype, it.next().getType());
       }
     }
-    
+
+    public void testFeatureCollectionWithNullGeometrySchemaRead() throws Exception {
+      String json = strip(
+          "{" +
+          "  'type': 'FeatureCollection'," +
+          "  'features': [" +
+          "    {" +
+          "      'type': 'Feature'," +
+          "      'geometry': null," +
+          "      'properties': {" +
+          "      }," +
+          "      'id': 'xyz.1'" +
+          "    }" +
+          "  ]" +
+          "}");
+
+      SimpleFeatureType type = fjson.readFeatureCollectionSchema(json, true);
+      assertNull(type.getGeometryDescriptor());
+    }
+
+    public void testFeatureCollectionWithoutGeometrySchemaRead() throws Exception {
+      String json = strip(
+          "{" +
+          "  'type': 'FeatureCollection'," +
+          "  'features': [" +
+          "    {" +
+          "      'type': 'Feature'," +
+          "      'properties': {" +
+          "      }," +
+          "      'id': 'xyz.1'" +
+          "    }" +
+          "  ]" +
+          "}");
+
+      SimpleFeatureType type = fjson.readFeatureCollectionSchema(json, true);
+      assertNull(type.getGeometryDescriptor());
+    }
+
     public void testFeatureCollectionWithNullAttributeAllFeaturesRead() throws Exception {
       String collectionText = collectionText(true, true, false, false, false, true);
       SimpleFeatureType ftype = fjson.readFeatureCollectionSchema((strip(collectionText)), false);
@@ -677,7 +758,20 @@ public class FeatureJSONTest extends GeoJSONTestSupport {
         Object crs = fjson.readCRS(reader(strip(crsText())));
         assertTrue(CRS.equalsIgnoreMetadata(CRS.decode("epsg:4326"), crs));
     }
-    
+
+    public void testFeatureCollectionWithNullBoundsWrite() throws Exception {
+        DefaultFeatureCollection features = new DefaultFeatureCollection() {
+            @Override
+            public ReferencedEnvelope getBounds() {
+                return null;
+            }
+        };
+        features.add(feature(0));
+
+        String json = fjson.toString(features);
+
+    }
+
     String crsText() {
         return 
             "{" + 

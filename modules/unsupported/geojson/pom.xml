@@ -45,6 +45,18 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    
+    <distributionManagement>
+    <repository>
+      <id>aurin</id>
+      <url>https://mvn.aurin.org.au/nexus/content/repositories/stable/</url>
+      <name>AURIN Repository</name>
+    </repository>
+    <snapshotRepository>
+      <id>aurin-snapshots</id>
+      <url>https://mvn.aurin.org.au/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
 
   <!-- =========================================================== -->
@@ -68,7 +80,7 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-main</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <!--   Third-party dependencies   -->
         <dependency>
@@ -80,7 +92,7 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -92,7 +104,7 @@
           <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-shapefile</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
           </dependency>
           <dependency>
             <groupId>commons-io</groupId>
@@ -102,4 +114,5 @@
       </profile>
     </profiles>
 
+    <version>11.3.1-SNAPSHOT</version>
 </project>
