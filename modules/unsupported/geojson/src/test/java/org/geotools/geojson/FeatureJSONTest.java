@@ -578,6 +578,7 @@ public class FeatureJSONTest extends GeoJSONTestSupport {
         fc.add(fb.buildFeature("xyz.1"));
 
         FeatureJSON fj = new FeatureJSON();
+        fj.setEncodeFeatureCollectionCRS(true);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         fj.writeFeatureCollection(fc, os);
 
