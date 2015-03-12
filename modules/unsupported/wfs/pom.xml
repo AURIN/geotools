@@ -86,6 +86,18 @@
     </developer>
   </developers>
 
+  <distributionManagement>
+    <repository>
+      <id>aurin</id>
+      <url>https://mvn.aurin.org.au/nexus/content/repositories/stable/</url>
+      <name>AURIN Repository</name>
+    </repository>
+    <snapshotRepository>
+      <id>aurin-snapshots</id>
+      <url>https://mvn.aurin.org.au/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
 
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
@@ -94,22 +106,22 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-xml</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-referencing</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
       <artifactId>gt-xsd-wfs</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools.ogc</groupId>
       <artifactId>net.opengis.wfs</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>xpp3</groupId>
@@ -126,13 +138,13 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-sample-data</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-hsql</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
 	<dependency>
@@ -159,5 +171,6 @@
     </plugins>
   </build>
 
+  <version>11.5.1-AURIN</version>
 </project>
 
