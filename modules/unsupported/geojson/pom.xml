@@ -88,7 +88,10 @@
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
         </dependency>
-
+        <dependency>
+          <groupId>commons-lang</groupId>
+          <artifactId>commons-lang</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
@@ -114,5 +117,5 @@
       </profile>
     </profiles>
 
-    <version>11.5.1-AURIN</version>
+    <version>11.5.2-AURIN</version>
 </project>
