@@ -47,7 +47,9 @@
     <module>app-schema</module>
     <module>brewer</module>
     <module>complex</module>
+    <!-- XXX
     <module>graph</module>
+    -->
     <module>grid</module>
     <module>validation</module>
     <module>wms</module>
