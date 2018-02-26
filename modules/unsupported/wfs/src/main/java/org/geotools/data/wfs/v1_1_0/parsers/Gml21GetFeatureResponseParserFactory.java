@@ -17,34 +17,31 @@
 package org.geotools.data.wfs.v1_1_0.parsers;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * A WFS response parser factory for GetFeature requests in {@code text/xml; subtype=gml/2.1.2}
  * output format.
- * 
+ *
  * @author Gabriel Roldan (OpenGeo)
  * @version $Id$
- * @since 2.6
- *
- *
- *
  * @source $URL$
- *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
- *         /wfs/v1_1_0/parsers/Gml31GetFeatureResponseParserFactory.java $
+ * http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ * /wfs/v1_1_0/parsers/Gml31GetFeatureResponseParserFactory.java $
+ * @since 2.6
  */
 @SuppressWarnings("nls")
 public class Gml21GetFeatureResponseParserFactory extends GmlAbstractGetFeatureResponseParserFactory {
 
-    private static final String SUPPORTED_OUTPUT_FORMAT1 = "text/xml; subtype=gml/2.1.2";
-    private static final String SUPPORTED_OUTPUT_FORMAT2 = "GML2";
-    private static final String SUPPORTED_OUTPUT_FORMAT3 = "text/xml; subType=gml/2.1.2/profiles/gmlsf/1.0.0/0";
-    
+  private static final List<String> SUPPORTED_OUTPUT_FORMATS = Arrays.asList(
+    "text/xml; subtype=gml/2.1.2", "GML2", "text/xml; subType=gml/2.1.2/profiles/gmlsf/1.0.0/0",
+    "text/xml; subtype=gml/2.1.2., version=1.2.0"
+  );
 
-    protected boolean isSupportedOutputFormat(String outputFormat) {
-        boolean matches = SUPPORTED_OUTPUT_FORMAT1.equals(outputFormat)
-                || SUPPORTED_OUTPUT_FORMAT2.equals(outputFormat)
-                || SUPPORTED_OUTPUT_FORMAT3.equals(outputFormat)
-                ;
-        return matches;
-    }
+  protected boolean isSupportedOutputFormat(String outputFormat) {
+    return SUPPORTED_OUTPUT_FORMATS.contains(outputFormat);
+  }
 
 }
