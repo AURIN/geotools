@@ -36,7 +36,8 @@ import java.util.List;
 public class Gml21GetFeatureResponseParserFactory extends GmlAbstractGetFeatureResponseParserFactory {
 
   private static final List<String> SUPPORTED_OUTPUT_FORMATS = Arrays.asList(
-    "text/xml; subtype=gml/2.1.2", "GML2", "text/xml; subType=gml/2.1.2/profiles/gmlsf/1.0.0/0",
+    "text/xml; subtype=gml/2.1.2", "GML2",
+    "text/xml; subType=gml/2.1.2/profiles/gmlsf/1.0.0/0",
     "text/xml; subtype=gml/2.1.2., version=1.2.0"
   );
 

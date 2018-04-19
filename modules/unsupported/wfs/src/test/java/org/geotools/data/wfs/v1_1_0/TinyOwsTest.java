@@ -63,7 +63,7 @@ public class TinyOwsTest {
         Assert.assertEquals(1, types.length);
         Assert.assertEquals("comuni:comuni11", types[0]);
     }
-    
+
     private void assertXMLEqual(String expectedXmlResource, String actualXml) throws IOException {
         String control = IOUtils.toString(TestData.getResource(this, expectedXmlResource));
         control = control.replace("${project.version}", GeoTools.getVersion().toString());
@@ -74,7 +74,7 @@ public class TinyOwsTest {
             throw new IOException(e);
         }        
     }
-    
+
     @Test
     public void testGetFirstFeatures() throws Exception {        
         final String queryXml = "<wfs:Query srsName=\"urn:ogc:def:crs:EPSG::3857\" typeName=\"comuni:comuni11\"/>";
