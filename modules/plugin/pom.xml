@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>modules</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>20-SNAPSHOT</version>
   </parent>
 
   <!-- =========================================================== -->
@@ -68,6 +68,7 @@
     <module>svg</module>
     <module>coverage-multidim</module>
     <module>geopkg</module>
+    <module>mongodb</module>
   </modules>
 
 </project>

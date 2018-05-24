@@ -93,8 +93,8 @@
     <test.forkMode>once</test.forkMode>
     <test.args></test.args>
     <src.output>${basedir}/target</src.output>
-    <imageio.ext.version>1.1.19</imageio.ext.version>
-    <jaiext.version>1.0.19</jaiext.version>
+    <imageio.ext.version>1.1.22</imageio.ext.version>
+    <jaiext.version>1.0.22</jaiext.version>
     <netcdf.version>4.6.6</netcdf.version>
     <jt.version>1.4.0</jt.version>
     <java.awt.headless>true</java.awt.headless>
@@ -106,6 +106,7 @@
     <javac.maxHeapSize>256M</javac.maxHeapSize>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <postgresql.jdbc.version>42.1.1</postgresql.jdbc.version>
+    <solrj.version>7.2.1</solrj.version>
     <maven.javadoc.plugin.version>2.10.3</maven.javadoc.plugin.version>
     <git.commit.useNative>false</git.commit.useNative>
     <git.commit.runOnlyOnce>true</git.commit.runOnlyOnce>
@@ -195,6 +196,27 @@
         </site>
       </distributionManagement>
     </profile>
+    <profile>
+      <id>noLocalChanges</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <version>1.9.5</version>
+            <executions>
+              <execution>
+                <id>exec1</id>
+                <phase>install</phase>
+                <goals>
+                   <goal>check-local-modification</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 
@@ -204,7 +226,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>geotools</artifactId>
   <packaging>pom</packaging>
-  <version>19-SNAPSHOT</version>
+  <version>20-SNAPSHOT</version>
   <name>GeoTools</name>
 
   <scm>
@@ -577,12 +599,46 @@
   <!-- =========================================================== -->
   <dependencyManagement>
     <dependencies>
+      <!--
       <dependency>
         <groupId>net.java.dev.jsr-275</groupId>
         <artifactId>jsr-275</artifactId>
         <version>1.0-beta-2</version>
       </dependency>
-
+       -->
+      <!--dependency>
+        <groupId>javax.measure</groupId>
+        <artifactId>unit-api</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>tec.uom</groupId>
+        <artifactId>uom-se</artifactId>
+        <version>1.0.9</version>
+      </dependency>
+      <dependency>
+        <groupId>si.uom</groupId>
+        <artifactId>si-units-java8</artifactId>
+        <version>0.8</version>
+      </dependency-->
+      <dependency>
+          <groupId>systems.uom</groupId>
+          <artifactId>systems-common-java8</artifactId>
+          <version>0.7.2</version>
+      </dependency>
+      <!-- inconsistent cannot load due to missing drag quantity -->
+      <!--dependency>
+        <groupId>systems.uom</groupId>
+        <artifactId>systems-ucum-java8</artifactId>
+        <version>0.7.2</version>
+      </dependency-->
+      
+      <dependency>
+        <groupId>systems.uom</groupId>
+        <artifactId>systems-common-java8</artifactId>
+        <version>0.7.2</version>
+      </dependency>
+    
       <!-- Java Advanced Imaging (JAI) -->
       <dependency>
         <groupId>javax.media</groupId>
@@ -683,6 +739,11 @@
       </dependency>
       <dependency>
         <groupId>it.geosolutions.imageio-ext</groupId>
+        <artifactId>imageio-ext-gdalsrp</artifactId>
+        <version>${imageio.ext.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>it.geosolutions.imageio-ext</groupId>
         <artifactId>imageio-ext-imagereadmt</artifactId>
         <version>${imageio.ext.version}</version>
       </dependency>
@@ -742,8 +803,9 @@
         <groupId>org.jaitools</groupId>
         <artifactId>jt-zonalstats</artifactId>
         <version>${jt.version}</version>
-       </dependency>
-      
+      </dependency>
+
+       
       <!-- Mathematic, geometries, SVG... -->
       <dependency>
         <groupId>org.ejml</groupId>
@@ -955,7 +1017,7 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.17</version>
+        <version>5.1.46</version>
       </dependency>
       <dependency>
         <groupId>org.hsqldb</groupId>
@@ -1210,6 +1272,11 @@
         <version>${jaiext.version}</version>
       </dependency>
       <dependency>
+        <groupId>it.geosolutions.jaiext.scale2</groupId>
+        <artifactId>jt-scale2</artifactId>
+        <version>${jaiext.version}</version>
+      </dependency>
+      <dependency>
         <groupId>it.geosolutions.jaiext.stats</groupId>
         <artifactId>jt-stats</artifactId>
         <version>${jaiext.version}</version>
@@ -1294,6 +1361,17 @@
         <artifactId>sqlite-jdbc</artifactId>
         <version>3.20.0</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-solrj</artifactId>
+        <version>${solrj.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
     </dependencies>
 
   </dependencyManagement>
@@ -1354,6 +1432,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <version>3.4</version>
+        </plugin>
+        <plugin>
+          <groupId>com.coveo</groupId>
+            <artifactId>fmt-maven-plugin</artifactId>
+            <version>2.4.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1447,7 +1530,7 @@
             <exclude>${stress.skip.pattern}</exclude>
             <exclude>${test.exclude.pattern}</exclude>
           </excludes>
-          <argLine>-Xmx${test.maxHeapSize} ${jvm.opts} -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Dorg.geotools.image.test.skip=${skip.image.tests} -Dorg.geotools.image.test.interactive=${interactive.image} -Djava.awt.headless=${java.awt.headless} -Dsun.java2d.d3d=${sun.java2d.d3d} -Djava.io.tmpdir="${java.io.tmpdir}" -Djava.library.path="${java.library.path}" ${test.args}  -XX:+TieredCompilation -XX:TieredStopAtLevel=1</argLine>
+          <argLine>-Xmx${test.maxHeapSize} ${jvm.opts} -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Dorg.geotools.image.test.skip=${skip.image.tests} -Dorg.geotools.image.test.interactive=${interactive.image} -Djava.awt.headless=${java.awt.headless} -Dsun.java2d.d3d=${sun.java2d.d3d} -Djava.io.tmpdir="${java.io.tmpdir}" -Djava.library.path="${java.library.path}" ${test.args}  -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+IgnoreUnrecognizedVMOptions --add-modules=java.xml.bind --add-modules=java.activation</argLine>
           <!-- Ignores test failure only if we are generating a       -->
           <!-- report for publication on the web site. See the        -->
           <!-- profiles section at the begining of this pom.xml file. -->
@@ -1609,7 +1692,7 @@
 
           <!-- Enables the Javadoc tool to interpret a simple, one-argument -->
           <!-- custom block tag tagname in doc comments. Note: <placement/> -->
-          <!-- should be a combinaison of the letters Xaoptcmf.             -->
+          <!-- should be a combination of the letters Xaoptcmf.             -->
           <tags>
             <tag>
               <name>todo</name>
@@ -1734,6 +1817,23 @@
           </groups>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.coveo</groupId>
+            <artifactId>fmt-maven-plugin</artifactId>
+            <configuration>
+                <verbose>false</verbose>
+                <filesNamePattern>.*\.java</filesNamePattern>
+                <skip>false</skip>
+                <style>aosp</style>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>format</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
   </build>
 
@@ -1806,7 +1906,7 @@
 
           <!-- Enables the Javadoc tool to interpret a simple, one-argument -->
           <!-- custom block tag tagname in doc comments. Note: <placement/> -->
-          <!-- should be a combinaison of the letters Xaoptcmf.             -->
+          <!-- should be a combination of the letters Xaoptcmf.             -->
           <tags>
             <tag>
               <name>todo</name>

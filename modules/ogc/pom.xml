@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>modules</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>20-SNAPSHOT</version>
   </parent>
 
   <groupId>org.geotools</groupId>
@@ -55,6 +55,13 @@
             <projectnature>org.eclipse.pde.PluginNature</projectnature>
           </additionalProjectnatures>
        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.coveo</groupId>
+        <artifactId>fmt-maven-plugin</artifactId>
+        <configuration>
+            <skip>true</skip>
+        </configuration>
       </plugin>
     </plugins>
   </build>
