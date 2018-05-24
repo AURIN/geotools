@@ -32,50 +32,50 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public class EpaVicDataStoreIT {
 
-  public static String TYPENAME1 = "measurement";
+    public static String TYPENAME1 = "measurement";
 
-  private EpaVicDatastore dataStore;
+    private EpaVicDatastore dataStore;
 
-  private Query q;
+    private Query q;
 
-  @Before
-  public void setUp() throws Exception {
-    q = new Query("measurement",
-        ECQL.toFilter("MonitorId='PM10' AND TimeBasisId='24HR_AV' "
-            + "AND FromDate='2009-02-07T00:00:00' AND ToDate='2009-02-07T00:00:00'"));
-  }
+    @Before
+    public void setUp() throws Exception {
+        q =
+                new Query(
+                        "measurement",
+                        ECQL.toFilter(
+                                "MonitorId='PM10' AND TimeBasisId='24HR_AV' "
+                                        + "AND FromDate='2009-02-07T00:00:00' AND ToDate='2009-02-07T00:00:00'"));
+    }
 
-  @After
-  public void tearDown() throws Exception {
-  }
+    @After
+    public void tearDown() throws Exception {}
 
-  @Test
-  public void testGetCount() throws Exception {
+    @Test
+    public void testGetCount() throws Exception {
 
-    EpaVicDatastore ds = EpaVicDataStoreFactoryTest
-        .createDefaultEPAServerTestDataStore();
-    ContentFeatureSource featureSource = ds.getFeatureSource("measurement");
-    int count = featureSource.getCount(q);
+        EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
+        ContentFeatureSource featureSource = ds.getFeatureSource("measurement");
+        int count = featureSource.getCount(q);
 
-    assertTrue(count > 0);
+        assertTrue(count > 0);
 
-    SimpleFeatureIterator it = featureSource.getFeatures(q).features();
+        SimpleFeatureIterator it = featureSource.getFeatures(q).features();
 
-    assertTrue(it.hasNext());
-    SimpleFeature feat = it.next();
+        assertTrue(it.hasNext());
+        SimpleFeature feat = it.next();
 
-    String attribute = (String) feat
-        .getAttribute(MeasurementFields.SITE_LIST_NAME.getFieldName());
+        String attribute =
+                (String) feat.getAttribute(MeasurementFields.SITE_LIST_NAME.getFieldName());
 
-    assertEquals("EAST", attribute);
-  }
+        assertEquals("EAST", attribute);
+    }
 
-  @Test
-  public void testGetSites() throws Exception {
+    @Test
+    public void testGetSites() throws Exception {
 
-    EpaVicDatastore ds = EpaVicDataStoreFactoryTest
-        .createDefaultEPAServerTestDataStore();
-    Sites sites = ds.retrieveSitesJSON();
-    assertEquals(29, sites.getSites().size());
-  }
+        EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
+        Sites sites = ds.retrieveSitesJSON();
+        assertEquals(29, sites.getSites().size());
+    }
 }
