@@ -28,15 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.StringJoiner;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.geotools.data.DefaultResourceInfo;
@@ -56,6 +48,7 @@ import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.gce.imagemosaic.Utils.BBOXFilterExtractor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.temporal.object.DefaultPeriod;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -64,6 +57,9 @@ import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.temporal.During;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -120,6 +116,9 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
                                 if (eqExpr instanceof PropertyIsEqualTo) {
                                     this.visit((PropertyIsEqualTo) eqExpr, map);
                                 }
+                                if (eqExpr instanceof During) {
+                                    this.visit((During) eqExpr, map);
+                                }
                             });
 
             return map;
@@ -130,8 +129,27 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
         }
 
         public Object visit(PropertyIsEqualTo expr, Object data) {
+
             Map<String, String> map = (Map<String, String>) data;
             map.put(expr.getExpression1().toString(), expr.getExpression2().toString());
+            return map;
+        }
+
+        public Object visit(During expr, Object data) {
+            Map<String, String> map = (Map<String, String>) data;
+            String propName = ((PropertyName) expr.getExpression1()).getPropertyName();
+            Date beg =
+                    ((DefaultPeriod) ((Literal) expr.getExpression2()).getValue())
+                            .getBeginning()
+                            .getPosition()
+                            .getDate();
+            Date end =
+                    ((DefaultPeriod) ((Literal) expr.getExpression2()).getValue())
+                            .getEnding()
+                            .getPosition()
+                            .getDate();
+            map.put(FROMDATE, (new SimpleDateFormat(EPATIMEFORMAT)).format(beg));
+            map.put(TODATE, (new SimpleDateFormat(EPATIMEFORMAT)).format(end));
             return map;
         }
     }
@@ -148,8 +166,11 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
                 + " CQL expression is incorrect: "
                 + msg
                 + ". the CQL has to have"
-                + " MonitorID, TimeBasisID, FromDate and ToDate equality expression tied by 'And' logical predicate."
-                + " Date must be expressed as YYYYMMDD";
+                + " MonitorID, TimeBasisID equality expression and time duration tied by 'And' logical predicate."
+                + " Date must be expressed as YYYYMMDD "
+                + "As in: \"BBOX(SHAPE, 144.79309207663,-37.790887782994,144.82828265916,-37.766134928431) \"\n"
+                + "                                        + \"AND MonitorId='PM10' AND TimeBasisId='24HR_RAV' \"\n"
+                + "                                        + \"AND DateTimeRecorded DURING 2018-03-21T10:00:00/2019-03-23T10:00:00\"";
     }
 
     public static String convertDateFormatBetweenAurinAndEPA(String aurinDate)
@@ -405,18 +426,6 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
         if (requestParams.size() < FILTERREQUIREDPARAMS) {
             throw new CQLException(
                     composeErrorMessage(filter, "The number of parameters provided is incorrect"));
-        }
-
-        // Converts timestamps from ISO-8601 to the format EPA Vic API accepts
-        try {
-            requestParams.replace(
-                    FROMDATE,
-                    convertDateFormatBetweenAurinAndEPA((String) requestParams.get(FROMDATE)));
-            requestParams.replace(
-                    TODATE,
-                    convertDateFormatBetweenAurinAndEPA((String) requestParams.get(TODATE)));
-        } catch (ParseException e) {
-            throw new CQLException(composeErrorMessage(filter, e.getMessage()));
         }
 
         return requestParams;

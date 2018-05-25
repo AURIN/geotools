@@ -45,7 +45,7 @@ public class EpaVicDataStoreIT {
                         "measurement",
                         ECQL.toFilter(
                                 "MonitorId='PM10' AND TimeBasisId='24HR_AV' "
-                                        + "AND FromDate='2009-02-07T00:00:00' AND ToDate='2009-02-07T00:00:00'"));
+                                        + "AND DateTimeRecorded DURING 2018-03-21T10:00:00/2019-03-23T10:00:00"));
     }
 
     @After
