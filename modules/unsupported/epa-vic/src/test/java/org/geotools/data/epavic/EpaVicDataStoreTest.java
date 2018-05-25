@@ -73,7 +73,7 @@ public class EpaVicDataStoreTest {
                         "measurement",
                         ECQL.toFilter(
                                 "MonitorId='PM10' AND TimeBasisId='24HR_RAV' "
-                                        + "AND FromDate='2009-02-07T06:00:00' AND ToDate='2009-02-07T23:00:00'"));
+                                        + "AND DateTimeRecorded DURING 2018-03-21T10:00:00/2019-03-23T10:00:00"));
     }
 
     @After
@@ -331,10 +331,10 @@ public class EpaVicDataStoreTest {
         }
 
         NameValuePair[] check = new NameValuePair[4];
-        check[0] = new NameValuePair(EpaVicFeatureSource.FROMDATE, "2009020706");
+        check[0] = new NameValuePair(EpaVicFeatureSource.FROMDATE, "2018032110");
         check[1] = new NameValuePair(EpaVicFeatureSource.MONITORID, "PM10");
         check[2] = new NameValuePair(EpaVicFeatureSource.TIMEBASISID, "24HR_RAV");
-        check[3] = new NameValuePair(EpaVicFeatureSource.TODATE, "2009020723");
+        check[3] = new NameValuePair(EpaVicFeatureSource.TODATE, "2019032310");
 
         ArgumentCaptor<NameValuePair[]> captor = ArgumentCaptor.forClass(NameValuePair[].class);
         verify(getMock, times(2)).setQueryString(captor.capture());
