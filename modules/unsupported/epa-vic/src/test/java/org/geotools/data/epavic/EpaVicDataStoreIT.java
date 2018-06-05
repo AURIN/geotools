@@ -44,15 +44,15 @@ public class EpaVicDataStoreIT {
                 new Query(
                         "measurement",
                         ECQL.toFilter(
-                                "MonitorId='PM10' AND TimeBasisId='24HR_AV' "
-                                        + "AND DateTimeRecorded DURING 2018-03-21T10:00:00/2019-03-23T10:00:00"));
+                                "MonitorId='PM10' AND TimeBaseId='24HR_AV' "
+                                        + "AND DateTimeRecorded BETWEEN '2018-03-21T10:00:00' AND '2019-03-23T10:00:00'"));
     }
 
     @After
     public void tearDown() throws Exception {}
 
     @Test
-    public void testGetCount() throws Exception {
+    public void testGetMeasurement() throws Exception {
 
         EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
         ContentFeatureSource featureSource = ds.getFeatureSource("measurement");
@@ -64,11 +64,12 @@ public class EpaVicDataStoreIT {
 
         assertTrue(it.hasNext());
         SimpleFeature feat = it.next();
-
-        String attribute =
-                (String) feat.getAttribute(MeasurementFields.SITE_LIST_NAME.getFieldName());
-
-        assertEquals("EAST", attribute);
+        assertEquals(
+                "EAST",
+                (String) feat.getAttribute(MeasurementFields.SITE_LIST_NAME.getFieldName()));
+        assertEquals(
+                "Beta attenuation monitoring",
+                (String) feat.getAttribute(MeasurementFields.EQUIPMENT_TYPE.getFieldName()));
     }
 
     @Test
@@ -76,6 +77,6 @@ public class EpaVicDataStoreIT {
 
         EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
         Sites sites = ds.retrieveSitesJSON();
-        assertEquals(29, sites.getSites().size());
+        assertEquals(19, sites.getSites().size());
     }
 }

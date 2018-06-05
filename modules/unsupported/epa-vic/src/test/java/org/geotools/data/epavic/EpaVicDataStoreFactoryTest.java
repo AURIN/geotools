@@ -68,7 +68,7 @@ public class EpaVicDataStoreFactoryTest {
     /**
      * Helper method to read a JSON file into a String
      *
-     * @param fileName File name to load
+     * @param path File name to load
      * @return JSON content of the file
      * @throws URISyntaxException
      * @throws FileNotFoundException
