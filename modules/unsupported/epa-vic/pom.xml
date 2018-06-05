@@ -112,8 +112,31 @@
             <!-- The following tests are skipped because they do not extend 
               OnlineTestCase -->
             <exclude>**/*OnlineTest.java</exclude>
+            <!-- Ecludes integration tests -->
+            <exclude>**/*IT.java</exclude>
           </excludes>
         </configuration>
+      </plugin>
+
+      <!-- for integration testing -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.21.0</version>
+        <configuration>
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+          <includes>
+            <include>**/*IT.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

@@ -1,21 +1,3 @@
-/*
- *    GeoTools - The Open Source Java GIS Toolkit
- *    http://geotools.org
- *
- *    (C) 2002-2016, Open Source Geospatial Foundation (OSGeo)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
-
 package org.geotools.data.epavic;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -48,7 +30,6 @@ import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.gce.imagemosaic.Utils.BBOXFilterExtractor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.temporal.object.DefaultPeriod;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -56,10 +37,8 @@ import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.filter.temporal.During;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -76,7 +55,7 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
 
     public static String MONITORID = "MonitorId";
 
-    public static String TIMEBASISID = "TimeBasisId";
+    public static String TIMEBASEID = "TimeBaseId";
 
     public static String FROMDATE = "FromDate";
 
@@ -116,8 +95,8 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
                                 if (eqExpr instanceof PropertyIsEqualTo) {
                                     this.visit((PropertyIsEqualTo) eqExpr, map);
                                 }
-                                if (eqExpr instanceof During) {
-                                    this.visit((During) eqExpr, map);
+                                if (eqExpr instanceof PropertyIsBetween) {
+                                    this.visit((PropertyIsBetween) eqExpr, map);
                                 }
                             });
 
@@ -135,27 +114,15 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
             return map;
         }
 
-        public Object visit(During expr, Object data) {
+        public Object visit(PropertyIsBetween expr, Object data) {
             Map<String, String> map = (Map<String, String>) data;
-            String propName = ((PropertyName) expr.getExpression1()).getPropertyName();
-            Date beg =
-                    ((DefaultPeriod) ((Literal) expr.getExpression2()).getValue())
-                            .getBeginning()
-                            .getPosition()
-                            .getDate();
-            Date end =
-                    ((DefaultPeriod) ((Literal) expr.getExpression2()).getValue())
-                            .getEnding()
-                            .getPosition()
-                            .getDate();
-            map.put(FROMDATE, (new SimpleDateFormat(EPATIMEFORMAT)).format(beg));
-            map.put(TODATE, (new SimpleDateFormat(EPATIMEFORMAT)).format(end));
+            map.put(FROMDATE, expr.getLowerBoundary().toString());
+            map.put(TODATE, expr.getUpperBoundary().toString());
             return map;
         }
     }
 
     public EpaVicFeatureSource(ContentEntry entry, Query query) {
-
         super(entry, query);
         this.dataStore = (EpaVicDatastore) entry.getDataStore();
     }
@@ -166,17 +133,21 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
                 + " CQL expression is incorrect: "
                 + msg
                 + ". the CQL has to have"
-                + " MonitorID, TimeBasisID equality expression and time duration tied by 'And' logical predicate."
+                + " MonitorID, TimeBaseID equality expression and time duration tied by 'And' logical predicate."
                 + " Date must be expressed as YYYYMMDD "
-                + "As in: \"BBOX(SHAPE, 144.79309207663,-37.790887782994,144.82828265916,-37.766134928431) \"\n"
-                + "                                        + \"AND MonitorId='PM10' AND TimeBasisId='24HR_RAV' \"\n"
-                + "                                        + \"AND DateTimeRecorded DURING 2018-03-21T10:00:00/2019-03-23T10:00:00\"";
+                + "As in: \"BBOX(SHAPE, 144.79309207663,-37.790887782994,144.82828265916,-37.766134928431) "
+                + "AND MonitorId='PM10' AND TimeBaseId='24HR_RAV' "
+                + "AND DateTimeRecorded BETWEEN '2018-03-21T10:00:00' AND '2019-03-23T10:00:00'";
     }
 
     public static String convertDateFormatBetweenAurinAndEPA(String aurinDate)
             throws ParseException {
-        return (new SimpleDateFormat(EPATIMEFORMAT))
-                .format((new SimpleDateFormat(AURINTIMEFORMAT)).parse(aurinDate));
+        try {
+            return (new SimpleDateFormat(EPATIMEFORMAT))
+                    .format((new SimpleDateFormat(AURINTIMEFORMAT)).parse(aurinDate));
+        } catch (NullPointerException e) {
+            throw new ParseException(e.getMessage(), 0);
+        }
     }
 
     @Override
@@ -271,7 +242,7 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
                 }
             }
             return totalMeasurements;
-        } catch (CQLException e) {
+        } catch (CQLException | ParseException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -290,13 +261,13 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
             // Returns a reader for the result
             return new EpaVicFeatureReader(this.schema, siteStreams, sites, monitors);
 
-        } catch (CQLException e) {
+        } catch (CQLException | ParseException e) {
             throw new IOException(e);
         }
     }
 
     private Queue<InputStream> loadSiteStreams(Query query, Sites sites)
-            throws CQLException, IOException {
+            throws CQLException, IOException, ParseException {
         Map<String, Object> params = composeRequestParameters(query.getFilter());
         ReferencedEnvelope bbox = (ReferencedEnvelope) params.get(BBOXPARAM);
 
@@ -373,7 +344,8 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
      * @return Map of parameters and values
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Object> composeRequestParameters(Filter filter) throws CQLException {
+    public Map<String, Object> composeRequestParameters(Filter filter)
+            throws CQLException, ParseException {
 
         Map<String, Object> requestParams = null;
         BBOXFilterExtractor bboxExtractor = (new BBOXFilterExtractor());
@@ -390,45 +362,43 @@ public class EpaVicFeatureSource extends ContentFeatureSource {
                 requestParams.put(BBOXPARAM, bbox);
             }
         } catch (Exception e) {
-            CQLException ce =
-                    new CQLException(
-                            "The "
-                                    + filter.toString()
-                                    + " CQL expression is incorrect: "
-                                    + e.getMessage());
-            ce.setStackTrace(e.getStackTrace());
-            throw ce;
+            throw new CQLException(composeErrorMessage(filter, "CQL expression is incorrect"));
         }
 
-        if (requestParams.isEmpty()) {
-            return requestParams;
+        // Checks that all required parameters are present
+        if (requestParams.size() < FILTERREQUIREDPARAMS) {
+            throw new CQLException(composeErrorMessage(filter, "There are too few parameters"));
         }
 
-        // Checks that all required parameters are present, and that no parameter
-        // other than the allowed ones is present
+        // Checks that no parameter other than the allowed ones is present
         try {
             requestParams.forEach(
                     (k, v) -> {
                         if (!(BBOXPARAM.equalsIgnoreCase(k)
                                 || MONITORID.equalsIgnoreCase(k)
-                                || TIMEBASISID.equalsIgnoreCase(k)
+                                || TIMEBASEID.equalsIgnoreCase(k)
                                 || FROMDATE.equalsIgnoreCase(k)
                                 || TODATE.equalsIgnoreCase(k))) {
                             throw new IllegalArgumentException();
                         }
                     });
         } catch (IllegalArgumentException e) {
-            throw new CQLException(
-                    composeErrorMessage(
-                            filter, "Some of the parameter names provieded are not valid"));
+            throw new CQLException(composeErrorMessage(filter, "Some parameters are missing"));
         }
 
-        if (requestParams.size() < FILTERREQUIREDPARAMS) {
-            throw new CQLException(
-                    composeErrorMessage(filter, "The number of parameters provided is incorrect"));
-        }
+        // Converts dates into EPA format
+        try {
+            requestParams.put(
+                    FROMDATE,
+                    convertDateFormatBetweenAurinAndEPA((String) requestParams.get(FROMDATE)));
+            requestParams.put(
+                    TODATE,
+                    convertDateFormatBetweenAurinAndEPA((String) requestParams.get(TODATE)));
+            return requestParams;
 
-        return requestParams;
+        } catch (IllegalArgumentException | ParseException e) {
+            throw new CQLException(composeErrorMessage(filter, e.getMessage()));
+        }
     }
 
     @Override
