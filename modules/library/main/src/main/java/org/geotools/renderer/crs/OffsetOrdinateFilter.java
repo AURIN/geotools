@@ -1,7 +1,7 @@
 /*
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
- * 
+ *
  *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
@@ -16,12 +16,12 @@
  */
 package org.geotools.renderer.crs;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFilter;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFilter;
 
 /**
  * Applies a static offset to the specified ordinate in all coordinates of the geometry
- * 
+ *
  * @author Andrea Aime - OpenGeo
  */
 class OffsetOrdinateFilter implements CoordinateSequenceFilter {
@@ -45,5 +45,4 @@ class OffsetOrdinateFilter implements CoordinateSequenceFilter {
     public boolean isGeometryChanged() {
         return true;
     }
-
 }

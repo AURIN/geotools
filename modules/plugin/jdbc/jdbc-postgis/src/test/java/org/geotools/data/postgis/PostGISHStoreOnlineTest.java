@@ -18,7 +18,6 @@ package org.geotools.data.postgis;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
 import org.geotools.data.store.ContentFeatureSource;
@@ -31,15 +30,32 @@ import org.opengis.filter.PropertyIsEqualTo;
 
 public class PostGISHStoreOnlineTest extends JDBCTestSupport {
 
-    private final static Logger LOGGER = Logger.getLogger(PostGISHStoreOnlineTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PostGISHStoreOnlineTest.class.getName());
+
+    private PostGISHStoreTestSetup pgHstoreSetup;
 
     @Override
     protected JDBCTestSetup createTestSetup() {
-        return new PostGISHStoreTestSetup();
+        pgHstoreSetup = new PostGISHStoreTestSetup();
+        return pgHstoreSetup;
+    }
+
+    private boolean skipTests() {
+        return pgHstoreSetup.hasException;
+    }
+
+    @Test
+    public void testReportingException() throws Exception {
+        if (skipTests()) {
+            LOGGER.warning("HSTORE tests will be skipped due to previous exception");
+        }
     }
 
     @Test
     public void testSinglePair() throws Exception {
+        if (skipTests()) {
+            return;
+        }
         String name = "singlepair";
         Object object = getHstoreColumnForFeatureWithName(name);
         assertNotNull(object);
@@ -53,6 +69,9 @@ public class PostGISHStoreOnlineTest extends JDBCTestSupport {
 
     @Test
     public void testDoublePair() throws Exception {
+        if (skipTests()) {
+            return;
+        }
         String name = "doublepair";
         Object object = getHstoreColumnForFeatureWithName(name);
         assertNotNull(object);
@@ -68,6 +87,9 @@ public class PostGISHStoreOnlineTest extends JDBCTestSupport {
 
     @Test
     public void testPairWithNullValue() throws Exception {
+        if (skipTests()) {
+            return;
+        }
         String name = "pairwithnullvalue";
         Object object = getHstoreColumnForFeatureWithName(name);
         assertNotNull(object);
@@ -81,6 +103,9 @@ public class PostGISHStoreOnlineTest extends JDBCTestSupport {
 
     @Test
     public void testEmpty() throws Exception {
+        if (skipTests()) {
+            return;
+        }
         String name = "emptycontent";
         Object object = getHstoreColumnForFeatureWithName(name);
         assertNotNull(object);
@@ -92,6 +117,9 @@ public class PostGISHStoreOnlineTest extends JDBCTestSupport {
 
     @Test
     public void testNullEntry() throws Exception {
+        if (skipTests()) {
+            return;
+        }
         Object object = getHstoreColumnForFeatureWithName("nullcontent");
         assertNull(object);
     }

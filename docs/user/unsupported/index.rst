@@ -16,6 +16,7 @@ Research and Development:
 .. toctree::
    :maxdepth: 1
 
+   arcgis-rest
    css
    csv
    efeature/index
@@ -27,6 +28,7 @@ Research and Development:
    swing/index
    swt/index
    wps
+   gtopo30
    sample
 
 Unsupported rendering plugins:

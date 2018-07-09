@@ -16,29 +16,24 @@
  */
 package org.geotools.s3.cache;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.geotools.s3.S3Connector;
-
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Status;
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 import net.sf.ehcache.loader.CacheLoader;
+import org.geotools.s3.S3Connector;
 
-/**
- * Factory to create S3 chunks for caching
- */
+/** Factory to create S3 chunks for caching */
 public class S3ChunkEntryFactory implements CacheEntryFactory, CacheLoader {
 
     private static final Logger LOGGER = Logger.getLogger("S3");
@@ -49,49 +44,58 @@ public class S3ChunkEntryFactory implements CacheEntryFactory, CacheLoader {
         this.cacheBlockSize = config.getChunkSizeBytes();
     }
 
-    @Override public
-    Object createEntry(Object key) throws Exception {
-        return createEntry(key,((CacheEntryKey)key).getConnector());
+    @Override
+    public Object createEntry(Object key) throws Exception {
+        return createEntry(key, ((CacheEntryKey) key).getConnector());
     }
 
     private Object createEntry(Object key, S3Connector connector) throws IOException {
         byte[] val;
-        CacheEntryKey entryKey = (CacheEntryKey)key;
+        CacheEntryKey entryKey = (CacheEntryKey) key;
         int nBytes;
         byte[] buffer = new byte[cacheBlockSize];
-        S3ObjectInputStream stream =
-            this.initStream((long) entryKey.getBlock() * (long) this.cacheBlockSize,
-                entryKey.getBucket(), entryKey.getKey(), entryKey.getBlockSize(), connector.getS3Client());
-        if (stream == null) {
-            throw new RuntimeException("Unable to instantiate S3 stream. See logs for details.");
-        }
-        int readLength = this.cacheBlockSize;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        while (readLength > 0) {
-            nBytes = stream.read(buffer, 0, readLength);
+        try (S3Object object =
+                this.initStream(
+                        (long) entryKey.getBlock() * (long) this.cacheBlockSize,
+                        entryKey.getBucket(),
+                        entryKey.getKey(),
+                        entryKey.getBlockSize(),
+                        connector.getS3Client())) {
+            if (object == null) {
+                throw new RuntimeException(
+                        "Unable to instantiate S3 stream. See logs for details.");
+            }
+            int readLength = this.cacheBlockSize;
 
-            if (nBytes > 0) {
-                out.write(buffer, 0, nBytes);
-                readLength -= nBytes;
-            } else {
-                break;
+            try (InputStream stream = object.getObjectContent()) {
+                try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                    while (readLength > 0) {
+                        nBytes = stream.read(buffer, 0, readLength);
+
+                        if (nBytes > 0) {
+                            out.write(buffer, 0, nBytes);
+                            readLength -= nBytes;
+                        } else {
+                            break;
+                        }
+                    }
+                    val = out.toByteArray();
+                }
             }
         }
-
-        val = out.toByteArray();
-        out.close();
-        stream.close();
 
         return val;
     }
 
-    private S3ObjectInputStream initStream(long offset, String bucket, String key, int blockSize, AmazonS3 s3Client) {
+    private S3Object initStream(
+            long offset, String bucket, String key, int blockSize, AmazonS3 s3Client) {
         try {
-            S3Object object = s3Client.getObject(
-                (new GetObjectRequest(bucket, key))
-                    .withRange(offset, offset + blockSize));
+            S3Object object =
+                    s3Client.getObject(
+                            (new GetObjectRequest(bucket, key))
+                                    .withRange(offset, offset + blockSize));
 
-            return object.getObjectContent();
+            return object;
         } catch (Exception e) {
             LOGGER.warning(e.getMessage());
         }
@@ -110,7 +114,7 @@ public class S3ChunkEntryFactory implements CacheEntryFactory, CacheLoader {
 
     @Override
     public Object load(Object key, Object argument) {
-        S3Connector connector = (S3Connector)argument;
+        S3Connector connector = (S3Connector) argument;
         try {
             return this.createEntry(key, connector);
         } catch (IOException e) {
@@ -135,14 +139,10 @@ public class S3ChunkEntryFactory implements CacheEntryFactory, CacheLoader {
     }
 
     @Override
-    public void init() {
-
-    }
+    public void init() {}
 
     @Override
-    public void dispose() throws CacheException {
-
-    }
+    public void dispose() throws CacheException {}
 
     @Override
     public Status getStatus() {

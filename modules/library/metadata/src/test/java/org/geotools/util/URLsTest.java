@@ -25,12 +25,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-
 import org.junit.Test;
 
-/**
- * Tests for {@link URLs}.
- */
+/** Tests for {@link URLs}. */
 public class URLsTest {
 
     private void assertURL(String expectedFilePath, String urlString) throws MalformedURLException {
@@ -66,7 +63,8 @@ public class URLsTest {
     public void testFileToUrl() {
         String url = URLs.fileToUrl(new File("file café")).toString();
         assertTrue("Expected '" + url + "' to start with 'file:'", url.startsWith("file:"));
-        assertTrue("Expected '" + url + "' to end with 'file%20caf%C3%A9'",
+        assertTrue(
+                "Expected '" + url + "' to end with 'file%20caf%C3%A9'",
                 url.endsWith("file%20caf%C3%A9"));
     }
 
@@ -103,8 +101,8 @@ public class URLsTest {
         assertURL(replaceSlashes("C:\\one"), "file://C:/one");
         assertURL(replaceSlashes("C:\\one\\two"), "file://C:/one/two");
         assertURL(replaceSlashes("C:\\one\\two\\and three"), "file://C:/one/two/and three");
-        assertEquals("sample", URLs.urlToFile(new URL("file:sample?query")).toString());
-        assertEquals("sample", URLs.urlToFile(new URL("file:sample#ref")).toString());
+        assertURL("sample", "file:sample?query");
+        assertURL("sample", "file:sample#ref");
         File file = File.createTempFile("hello", "world");
         handleFile(file.getAbsolutePath());
         handleFile(file.getPath());
@@ -112,6 +110,8 @@ public class URLsTest {
         URL url = new URL("file", "////oehhwsfs09", "/some/path/on/the/server/filename.nds");
         File windowsShareFile = URLs.urlToFile(url);
         assertNotNull(windowsShareFile);
+        assertURL("file café", "file:file%20caf%C3%A9");
+        assertURL("/file café", "file:/file%20caf%C3%A9");
+        assertURL("file café", "file://file%20caf%C3%A9");
     }
-
 }

@@ -16,28 +16,21 @@
  */
 package org.geotools.s3;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
-
 import javax.imageio.stream.ImageInputStreamImpl;
-
 import org.geotools.s3.cache.CacheEntryKey;
-
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
-
 import org.geotools.s3.cache.CacheManagement;
 
-/**
- * ImageInputStream implementation that fetches and caches data from S3
- */
+/** ImageInputStream implementation that fetches and caches data from S3 */
 public class S3ImageInputStreamImpl extends ImageInputStreamImpl {
 
-    private final static Logger LOGGER = Logger.getLogger("S3");
+    private static final Logger LOGGER = Logger.getLogger("S3");
     private final String fileName;
     private final S3Connector connector;
     private String url;
@@ -64,22 +57,27 @@ public class S3ImageInputStreamImpl extends ImageInputStreamImpl {
         this.url = input;
         String urlWithoutQueryString = input.split("\\?")[0];
         String parts[] = urlWithoutQueryString.split("/");
-        StringBuilder keyBuilder = new StringBuilder();
-        this.bucket = parts[2];
-        for (int i = 3; i < parts.length; i++) {
-            keyBuilder.append("/").append(parts[i]);
+        if (input.startsWith("http")) {
+            this.bucket = parts[parts.length - 2];
+            this.key = parts[parts.length - 1];
+        } else {
+            StringBuilder keyBuilder = new StringBuilder();
+            this.bucket = parts[2];
+            for (int i = 3; i < parts.length; i++) {
+                keyBuilder.append("/").append(parts[i]);
+            }
+            this.key = keyBuilder.toString();
+            /* Strip leading slash */
+            this.key = this.key.startsWith("/") ? this.key.substring(1) : this.key;
         }
-        this.key = keyBuilder.toString();
-        /* Strip leading slash */
-        this.key = this.key.startsWith("/") ? this.key.substring(1) : this.key;
 
-        S3Object object = this.getS3Client().getObject(new GetObjectRequest(this.bucket, this.key));
-        ObjectMetadata meta = object.getObjectMetadata();
+        AmazonS3 s3Client = this.getS3Client();
+        ObjectMetadata meta =
+                s3Client.getObjectMetadata(new GetObjectMetadataRequest(this.bucket, this.key));
+        this.length = meta.getContentLength();
 
         this.fileName = nameFromKey(this.key);
-        this.length = meta.getContentLength();
         this.cacheBlockSize = CacheManagement.DEFAULT.getCacheConfig().getChunkSizeBytes();
-
     }
 
     private String nameFromKey(String key) {
@@ -89,7 +87,8 @@ public class S3ImageInputStreamImpl extends ImageInputStreamImpl {
 
     private byte[] getFromCache(int block) throws IOException {
         int blockSizeForBlock = this.calculateBlockSizeForBlock(block);
-        CacheEntryKey keyForBlock = new CacheEntryKey(this.bucket, this.key, block, blockSizeForBlock);
+        CacheEntryKey keyForBlock =
+                new CacheEntryKey(this.bucket, this.key, block, blockSizeForBlock);
         return CacheManagement.DEFAULT.getChunk(keyForBlock, connector);
     }
 
@@ -136,7 +135,8 @@ public class S3ImageInputStreamImpl extends ImageInputStreamImpl {
             int block = getBlockIndex();
             int offset = getCurrentOffset();
             byte[] blockBytes = this.getFromCache(block);
-            //block could be longer than what we want to read... or shorter, or longer than the rest of the block
+            // block could be longer than what we want to read... or shorter, or longer than the
+            // rest of the block
             int bytesToRead = Math.min(readRemaining, blockBytes.length - offset);
             readBuffer.put(blockBytes, offset, bytesToRead);
             readRemaining -= bytesToRead;
