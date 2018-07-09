@@ -77,6 +77,6 @@ public class EpaVicDataStoreIT {
 
         EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
         Sites sites = ds.retrieveSitesJSON();
-        assertEquals(19, sites.getSites().size());
+        assertEquals(40, sites.getSites().size());
     }
 }
