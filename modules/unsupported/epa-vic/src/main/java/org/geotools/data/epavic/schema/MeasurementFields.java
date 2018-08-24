@@ -12,7 +12,7 @@ public enum MeasurementFields {
     MONITOR_COMMON_NAME(Measurement.MONITOR_COMMON_NAME, String.class),
     MONITOR_EPA_URL(Measurement.MONITOR_EPA_URL, String.class),
     MONITOR_PRES_PRECISIONS(Measurement.MONITOR_PRESENTATION_PRECISION, Integer.class),
-    MONITOR_UNIT_OF_MEASURE(Measurement.MONITOR_UNIT_OF_MEASURE, Integer.class),
+    MONITOR_UNIT_OF_MEASURE(Measurement.MONITOR_UNIT_OF_MEASURE, String.class),
     SITE_LIST_NAME(Measurement.SITE_LIST_NAME, String.class),
     SITE_FIRE_HAZARD(Site.FIRE_HAZARD_CATEGORY, Integer.class),
     LONG(Site.LONG, Double.class),
