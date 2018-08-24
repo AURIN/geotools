@@ -228,6 +228,10 @@ public class EpaVicDatastore extends ContentDataStore {
             }
 
             try {
+                this.LOGGER.log(
+                        Level.FINE,
+                        "Waiting {}s before querying the EPA Vic server again",
+                        +wait * 1000);
                 Thread.sleep(wait * 1000);
             } catch (InterruptedException e) {
                 LOGGER.log(Level.SEVERE, "InterruptedException: " + e.getMessage());

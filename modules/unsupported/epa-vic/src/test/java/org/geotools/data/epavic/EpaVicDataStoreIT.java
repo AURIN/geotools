@@ -26,7 +26,6 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.filter.text.ecql.ECQL;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -36,29 +35,23 @@ public class EpaVicDataStoreIT {
 
     private EpaVicDatastore dataStore;
 
-    private Query q;
-
-    @Before
-    public void setUp() throws Exception {
-        q =
-                new Query(
-                        "measurement",
-                        ECQL.toFilter(
-                                "MonitorId='PM10' AND TimeBaseId='24HR_AV' "
-                                        + "AND DateTimeRecorded BETWEEN '2018-03-21T10:00:00' AND '2019-03-23T10:00:00'"));
-    }
-
     @After
     public void tearDown() throws Exception {}
 
     @Test
-    public void testGetMeasurement() throws Exception {
+    public void testGetMeasurementBBOX() throws Exception {
 
+        Query q =
+                new Query(
+                        "measurement",
+                        ECQL.toFilter(
+                                "BBOX(geometry, -43, 96, -9, 160) AND MonitorId='CO' AND TimeBaseId='24HR_AV' "
+                                        + "AND DateTimeRecorded BETWEEN '2018-03-21T10:00:00' AND '2019-03-23T10:00:00'"));
         EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
         ContentFeatureSource featureSource = ds.getFeatureSource("measurement");
         int count = featureSource.getCount(q);
 
-        assertTrue(count > 0);
+        assertTrue(count > 5900);
 
         SimpleFeatureIterator it = featureSource.getFeatures(q).features();
 
@@ -70,6 +63,14 @@ public class EpaVicDataStoreIT {
         assertEquals(
                 "Beta attenuation monitoring",
                 (String) feat.getAttribute(MeasurementFields.EQUIPMENT_TYPE.getFieldName()));
+
+        int count2 = 1;
+        while (it.hasNext()) {
+            feat = it.next();
+            count2++;
+        }
+
+        assertEquals(count, count2);
     }
 
     @Test
@@ -77,6 +78,6 @@ public class EpaVicDataStoreIT {
 
         EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
         Sites sites = ds.retrieveSitesJSON();
-        assertEquals(40, sites.getSites().size());
+        assertTrue(sites.getSites().size() > 40);
     }
 }
