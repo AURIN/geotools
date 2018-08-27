@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>${env.NEXUS_USER}</username>
+      <password>${env.NEXUS_SECRET}</password>
+    </server>
+  </servers>
+  <localRepository>/tmp/repo</localRepository>
+  <interactiveMode>false</interactiveMode>
+  <mirrors>
+    <mirror>
+      <id>nexus</id>
+      <name>Nexus</name>
+      <url>https://repo.eresearch.unimelb.edu.au/repository/maven-public/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+  </mirrors>
+  <profiles>
+    <profile>
+      <id>buildkite</id>
+      <properties>
+        <deployment>ci</deployment>
+        <aurin.dir>/app/build</aurin.dir>
+        <aurin-properties.dir>/app/build</aurin-properties.dir>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>buildkite</activeProfile>
+  </activeProfiles>
+</settings>
+

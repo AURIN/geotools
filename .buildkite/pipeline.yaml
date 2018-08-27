@@ -1,0 +1,35 @@
+---
+steps:
+  - label: 'Compile'
+    command: '--settings=.ci.settings.xml clean compile'
+    plugins:
+      docker#v1.4.0:
+        image: 'gcr.io/cloud-builders/mvn'
+        workdir: '/app'
+        shell: 'false'
+        user: '999'
+        debug: 'true'
+        environment:
+            - NEXUS_USER
+            - NEXUS_SECRET
+        mounts:
+          - /etc/passwd:/etc/passwd
+          - /etc/group:/etc/group
+  - wait: ~
+    continue_on_failure: true
+  - label: 'Cleanup'
+    command: '--settings=.ci.settings.xml clean'
+    plugins:
+      docker#v1.4.0:
+        image: 'gcr.io/cloud-builders/mvn'
+        workdir: '/app'
+        shell: 'false'
+        user: '999'
+        debug: 'true'
+        environment:
+          - NEXUS_USER
+          - NEXUS_SECRET
+        mounts:
+          - /etc/passwd:/etc/passwd
+          - /etc/group:/etc/group
+...
