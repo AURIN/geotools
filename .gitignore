@@ -1,6 +1,8 @@
+*.db
 .project
 .classpath
 .settings
+.settings/*
 target
 *.patch
 *.class
@@ -8,5 +10,9 @@ target
 nb-configuration.xml
 *.*~
 .DS_Store
-/deploy-to-aurin.sh
-/change-version.sh
+*.iml
+.idea/
+workspace
+*.db
+.metadata
+/modules/plugin/jdbc/jdbc-h2/null.12.log.db

@@ -597,6 +597,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         Logging.getLogger("org.geotools.data.wfs").fine(url);
         Logging.getLogger("org.geotools.data.communication").fine("Output: " + url);
         getUrl = new URL(url);
+        LOGGER.log(Level.INFO,"About to query GET: " + url);
         HttpURLConnection hc = protocolHandler.getConnectionFactory().getConnection(getUrl, GET);
         InputStream is = protocolHandler.getConnectionFactory().getInputStream(hc);
         WFSTransactionState ts = null;
@@ -780,6 +781,8 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             w.flush();
             w.close();
         }
+
+        LOGGER.log(Level.INFO, "About to query POST: " + postUrl.toExternalForm() + " with body: " + w);
 
         // JE: permit possibility for GZipped data.
         InputStream is = protocolHandler.getConnectionFactory().getInputStream(hc);
