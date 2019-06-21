@@ -1,0 +1,7 @@
+# Default pipeline from cli
+steps:
+- label: ":pipeline:"
+  agents:
+    jdk7: "true"
+  command: .buildkite/build.sh
+  
