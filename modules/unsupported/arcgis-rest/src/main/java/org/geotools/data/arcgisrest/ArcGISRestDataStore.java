@@ -20,7 +20,6 @@ package org.geotools.data.arcgisrest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
