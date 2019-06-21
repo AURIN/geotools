@@ -2,9 +2,16 @@
 
 set -euo pipefail
 
-function build {
-  local jdk7_home="${JAVA_7_HOME}"
-  mvn "-Paurin -Djdk7_home=${jdk7_home} clean compile"
+function javadoc_tools {
+  cd build/maven/javadoc
+  maven clean install
+  cd $BUILDKITE_BUILD_CHECKOUT_PATH
 }
 
-build
+function maven {
+  mvn -T 1C -Djava.awt.headless=true -Paurin ${@}
+}
+
+javadoc_tools
+
+maven clean install
