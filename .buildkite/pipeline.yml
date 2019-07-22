@@ -1,7 +1,11 @@
-# Default pipeline from cli
+---
 steps:
-- label: ":pipeline:"
-  agents:
-    jdk7: "true"
-  command: .buildkite/build.sh
-  
+  - label: ":pipeline: Test"
+    agents:
+      jdk7: "true"
+    command: .buildkite/build.sh test
+  - wait
+  - label: ":pipeline: Deploy"
+    agents:
+      jdk7: "true"
+    command: .buildkite/build.sh deploy
