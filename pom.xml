@@ -195,7 +195,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>geotools</artifactId>
   <packaging>pom</packaging>
-  <version>11.x-AURIN.2-SNAPSHOT</version>
+  <version>11.x-AURIN.2</version>
   <name>Geotools</name>
 
   <scm>
@@ -1410,61 +1410,66 @@
     </plugins>
   </reporting>
 
-  <distributionManagement>
-    <repository>
+  <!--
+<distributionManagement>
+  <repository>
+    <uniqueVersion>false</uniqueVersion>
+    <id>osgeo</id>
+    <name>Open Source Geospatial Foundation - Maven 2 repo</name>
+    <url>dav:http://download.osgeo.org/webdav/geotools/</url>
+  </repository>
+  <snapshotRepository>
+      <id>boundless</id>
       <uniqueVersion>false</uniqueVersion>
-      <id>osgeo</id>
-      <name>Open Source Geospatial Foundation - Maven 2 repo</name>
-      <url>dav:http://download.osgeo.org/webdav/geotools/</url>
-    </repository>
-    <snapshotRepository>
-        <id>boundless</id>
-        <uniqueVersion>false</uniqueVersion>
-        <name>Boundless Maven Repository</name>
-        <url>http://repo.boundlessgeo.com/main</url>
-    </snapshotRepository>
+      <name>Boundless Maven Repository</name>
+      <url>http://repo.boundlessgeo.com/main</url>
+  </snapshotRepository>
   </distributionManagement>
+  -->
 
   <!-- ================================================================== -->
   <!--     Repositories. This is where Maven looks for dependencies. The  -->
   <!--     Maven repository is implicit and doesn't need to be specified. -->
   <!-- ================================================================== -->
+
   <repositories>
-    <repository>
-      <id>maven2-repository.dev.java.net</id>
-      <name>Java.net repository</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
-    
+  <!--
+<repository>
+  <id>maven2-repository.dev.java.net</id>
+  <name>Java.net repository</name>
+  <url>http://download.java.net/maven/2</url>
+</repository>
 
-    <repository>
-      <id>geosolutions</id>
-      <name>geosolutions repository</name>
-      <url>http://maven.geo-solutions.it/</url>
-    </repository>
 
-    <repository>
-      <id>osgeo</id>
-      <name>Open Source Geospatial Foundation Repository</name>
-      <url>http://download.osgeo.org/webdav/geotools/</url>
-    </repository>
+<repository>
+  <id>geosolutions</id>
+  <name>geosolutions repository</name>
+  <url>http://maven.geo-solutions.it/</url>
+</repository>
 
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>boundless</id>
-      <name>Boundless Maven Repository</name>
-      <url>http://repo.boundlessgeo.com/main</url>
-    </repository>
+<repository>
+  <id>osgeo</id>
+  <name>Open Source Geospatial Foundation Repository</name>
+  <url>http://download.osgeo.org/webdav/geotools/</url>
+</repository>
 
-  </repositories>
+<repository>
+  <snapshots>
+    <enabled>true</enabled>
+  </snapshots>
+  <id>boundless</id>
+  <name>Boundless Maven Repository</name>
+  <url>http://repo.boundlessgeo.com/main</url>
+</repository>
+-->
+</repositories>
 
   <!-- =========================================================== -->
   <!--     Plugin repositories.                                    -->
   <!--     This is where Maven looks for plugin dependencies.      -->
   <!-- =========================================================== -->
   <pluginRepositories>
+    <!--
     <pluginRepository>
       <id>osgeo</id>
       <name>Open Source Geospatial Foundation Maven 2 Repository</name>
@@ -1489,8 +1494,8 @@
        <enabled>false</enabled>
      </snapshots>
     </pluginRepository>
+    -->
   </pluginRepositories>
-
 
   <!-- =========================================================== -->
   <!--     Modules for the build in approximate dependency order   -->

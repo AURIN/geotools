@@ -18,3 +18,4 @@ workspace
 /modules/plugin/jdbc/jdbc-h2/null.12.log.db
 /deploy-to-aurin.sh
 /change-version.sh
+pom.xml.versionsBackup
