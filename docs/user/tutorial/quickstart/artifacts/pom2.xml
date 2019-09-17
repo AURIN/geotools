@@ -33,6 +33,7 @@
         </dependency>
     </dependencies>
     <repositories>
+        <!--
         <repository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net repository</name>
@@ -51,5 +52,6 @@
             <name>OpenGeo Maven Repository</name>
             <url>http://repo.opengeo.org</url>
         </repository>
+        -->
     </repositories>
 </project>

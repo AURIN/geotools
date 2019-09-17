@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>11.x-AURIN.2-SNAPSHOT</version>
+    <version>11.x-AURIN.2</version>
   </parent>
 
 
@@ -85,19 +85,19 @@
       </roles>
     </developer>
   </developers>
-
-  <distributionManagement>
-    <repository>
-      <id>aurin</id>
-      <url>https://mvn.aurin.org.au/nexus/content/repositories/stable/</url>
-      <name>AURIN Repository</name>
-    </repository>
-    <snapshotRepository>
-      <id>aurin-snapshots</id>
-      <url>https://mvn.aurin.org.au/nexus/content/repositories/snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
-
+  <!--
+    <distributionManagement>
+      <repository>
+        <id>aurin</id>
+        <url>https://mvn.aurin.org.au/nexus/content/repositories/stable/</url>
+        <name>AURIN Repository</name>
+      </repository>
+      <snapshotRepository>
+        <id>aurin-snapshots</id>
+        <url>https://mvn.aurin.org.au/nexus/content/repositories/snapshots/</url>
+      </snapshotRepository>
+    </distributionManagement>
+  -->
 
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
@@ -171,6 +171,6 @@
     </plugins>
   </build>
 
-  <version>11.x-AURIN.2-SNAPSHOT</version>
+  <version>11.x-AURIN.2</version>
 </project>
 
