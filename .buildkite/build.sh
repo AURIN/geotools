@@ -37,7 +37,7 @@ function mvn_deploy {
   clean
   mvn -Djava.awt.headless=true --toolchains=toolchains.xml -Paurin-tools -DskipTests install
   echo "--- Deploy"
-  mvn -o -Djava.awt.headless=true --toolchains=toolchains.xml -Paurin-tools -DskipTests "-DaltDeploymentRepository=${MVN_REPOSITORY}" deploy
+  mvn -Djava.awt.headless=true --toolchains=toolchains.xml -Paurin-tools -DskipTests "-DaltDeploymentRepository=${MVN_REPOSITORY}" deploy
 }
 
 function usage() {
