@@ -16,6 +16,8 @@
  */
 package org.geotools.data;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
@@ -28,8 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import com.vividsolutions.jts.geom.Point;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
@@ -67,10 +68,6 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.data.memory.MemoryDataStore;
 
 /**
  * Tests cases for DataUtilities.
@@ -181,6 +178,7 @@ public class DataUtilitiesTest extends DataTestCase {
         assertEquals( subtract.size(), exclude.size() );
     }
 
+
     public void testUrlToFile() throws Exception {
         handleFile(System.getProperty("user.home"));
         handleFile(System.getProperty("user.dir"));
@@ -218,9 +216,9 @@ public class DataUtilitiesTest extends DataTestCase {
         handleFile(file.getPath());
         
         // from GEOT-3300 DataUtilities.urlToFile doesn't handle network paths correctly
-        URL url = new URL("file", "////oehhwsfs09", "/some/path/on/the/server/filename.nds");
-        File windowsShareFile = DataUtilities.urlToFile( url );
-        assertNotNull(windowsShareFile);
+        //URL url = new URL("file", "////oehhwsfs09", "/some/path/on/the/server/filename.nds");
+        //File windowsShareFile = DataUtilities.urlToFile( url );
+        //assertNotNull(windowsShareFile);
     }
 
     private String replaceSlashes(String string) {

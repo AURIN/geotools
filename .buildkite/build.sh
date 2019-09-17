@@ -3,62 +3,41 @@
 set -euo pipefail
 
 MVN_REPOSITORY="new_nexus::default::https://repo.aurin.cloud.edu.au/repository/maven-aurin-geotools"
-MVN_EVALUATE_PLUGIN="org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate"
+# MVN_EVALUATE_PLUGIN="org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate"
 BUILDKITE_BUILD_NUMBER="${BUILDKITE_BUILD_NUMBER:-1}"
+export JAVA_HOME="${JAVA_7_HOME}"
 
-function javadoc_tools {
+export PATH="${JAVA_7_HOME}/bin:${PATH}"
+
+set -x
+
+function bootstrap(){
+  echo "--- Bootstrapping Javadoc"
+  local base_dir="${PWD}"
   pushd build/maven/javadoc
-  maven clean install
+  mvn -B -Djava.awt.headless=true --toolchains="${base_dir}/toolchains.xml" -Paurin-tools install
   popd
 }
 
-function maven {
-  mvn -U -Djava.awt.headless=true -Paurin "${@}"
-}
-
-function set_version {
-  echo "--- Update Version"
-
-  local build_number
-  build_number="${BUILDKITE_BUILD_NUMBER}"
-
-  local current_version
-  current_version="$(maven ${MVN_EVALUATE_PLUGIN} -Dexpression=project.version -q -DforceStdout)"
-
-  local new_version
-  new_version="${current_version}"
-
-  #-${BUILDKITE_BUILD_NUMBER}"
-  #maven org.codehaus.mojo:versions-maven-plugin:2.7:set -DnewVersion="${CURRENT_VERSION}-${BUILDKITE_BUILD_NUMBER}"
-  buildkite-agent meta-data set version "v${new_version}"
-}
-
-function mvn_bootstrap {
-  echo "--- Bootstrap Build"
-  set_version
-  javadoc_tools
-}
-
-function mvn_clean {
-  echo "--- cleaning"
-  maven clean
-}
-
-function mvn_compile {
-  echo "--- Building"
-  maven compile
+function clean(){
+  echo "--- Cleaning"
+  mvn -B -Djava.awt.headless=true --toolchains=toolchains.xml -Paurin-tools clean
 }
 
 function mvn_test {
+  clean
+  bootstrap
+  echo "--- Debug"
+  env
   echo "--- Testing"
-  maven test
+  mvn -Djava.awt.headless=true --toolchains=toolchains.xml -Paurin-tools install
 }
 
 function mvn_deploy {
-  local version
-  version=$(buildkite-agent meta-data get version)
-  echo "--- Deploy ${version}"
-  maven -DskipTests "-DaltDeploymentRepository=${MVN_REPOSITORY}" deploy
+  clean
+  mvn -Djava.awt.headless=true --toolchains=toolchains.xml -Paurin-tools -DskipTests install
+  echo "--- Deploy"
+  mvn -o -Djava.awt.headless=true --toolchains=toolchains.xml -Paurin-tools -DskipTests "-DaltDeploymentRepository=${MVN_REPOSITORY}" deploy
 }
 
 function usage() {
@@ -67,16 +46,10 @@ function usage() {
 
 case $1 in
     test)
-      mvn_clean
-      mvn_bootstrap
-      mvn_compile
       mvn_test
     ;;
     deploy)
-      mvn_clean
-      mvn_bootstrap
-      mvn_compile
-      mvn_deploy
+     mvn_deploy
     ;;
     * )
       usage
