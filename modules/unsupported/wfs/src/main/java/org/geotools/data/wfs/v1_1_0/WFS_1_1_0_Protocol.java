@@ -658,9 +658,9 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
       WFS_1_1_0_Protocol.encode(request, encoder, out);
 
       postContent = new ByteArrayInputStream(out.toByteArray());
+      LOGGER.log(Level.INFO, "About to query POST: " + url + " with body: " +  ((new String(out.toByteArray()))));
     }
 
-    LOGGER.log(Level.INFO, "About to query POST: " + url + " with body: " + postContent);
     HTTPResponse httpResponse = http.post(url, postContent, "text/xml");
 
     String responseCharset = httpResponse.getResponseCharset();
