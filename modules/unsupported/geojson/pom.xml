@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.geotools</groupId>
         <artifactId>unsupported</artifactId>
-        <version>11.x-AURIN.2</version>
+        <version>11.x-AURIN.3</version>
     </parent>
 
   <!-- =========================================================== -->
@@ -117,5 +117,5 @@
       </profile>
     </profiles>
 
-    <version>11.x-AURIN.2</version>
+    <version>11.x-AURIN.3</version>
 </project>

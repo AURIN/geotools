@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>geotools</artifactId>
-    <version>11.x-AURIN.2-SNAPSHOT</version>
+    <version>11.x-AURIN.3</version>
   </parent>
 
 
