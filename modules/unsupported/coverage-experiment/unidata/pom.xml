@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt-coverage-experiment</artifactId>
-    <version>11.x-AURIN.2</version>
+    <version>11.x-AURIN.3</version>
   </parent>
 
   <!-- =========================================================== -->
