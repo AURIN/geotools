@@ -50,8 +50,7 @@ public class EpaVicDataStoreIT {
         EpaVicDatastore ds = EpaVicDataStoreFactoryTest.createDefaultEPAServerTestDataStore();
         ContentFeatureSource featureSource = ds.getFeatureSource("measurement");
         int count = featureSource.getCount(q);
-
-        assertTrue(count > 5900);
+        assertTrue(count > 2900);
 
         SimpleFeatureIterator it = featureSource.getFeatures(q).features();
 
