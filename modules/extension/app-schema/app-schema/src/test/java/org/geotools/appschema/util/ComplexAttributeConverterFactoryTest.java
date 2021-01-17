@@ -19,7 +19,7 @@ package org.geotools.appschema.util;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +59,7 @@ public class ComplexAttributeConverterFactoryTest extends TestCase {
 
     /** Test extracting complex attribute leaf value should be successful. */
     public void testLeafComplexAttribute() {
-        Collection<Property> attributes = new ArrayList<Property>();
+        Collection<Property> attributes = new ArrayList<>();
         AttributeDescriptor descriptor =
                 new AttributeDescriptorImpl(
                         XSSchema.STRING_TYPE,
@@ -67,7 +67,7 @@ public class ComplexAttributeConverterFactoryTest extends TestCase {
                         1,
                         1,
                         true,
-                        (Object) null);
+                        null);
         attributes.add(new AttributeImpl("rini", descriptor, null));
         ComplexAttribute gmlName =
                 new ComplexAttributeImpl(attributes, GMLSchema.CODETYPE_TYPE, null);
@@ -77,7 +77,7 @@ public class ComplexAttributeConverterFactoryTest extends TestCase {
 
     /** Test extracting complex attribute non-leaf value should fail. */
     public void testParentComplexAttribute() {
-        Collection<Property> attributes = new ArrayList<Property>();
+        Collection<Property> attributes = new ArrayList<>();
         AttributeDescriptor descriptor =
                 new AttributeDescriptorImpl(
                         XSSchema.STRING_TYPE,
@@ -85,12 +85,12 @@ public class ComplexAttributeConverterFactoryTest extends TestCase {
                         1,
                         1,
                         true,
-                        (Object) null);
+                        null);
         attributes.add(new AttributeImpl("rini", descriptor, null));
         ComplexAttribute gmlName =
                 new ComplexAttributeImpl(attributes, GMLSchema.CODETYPE_TYPE, null);
 
-        Collection<Property> parentAttributes = new ArrayList<Property>();
+        Collection<Property> parentAttributes = new ArrayList<>();
         parentAttributes.add(gmlName);
         ComplexAttribute parentAtt =
                 new ComplexAttributeImpl(
@@ -133,7 +133,7 @@ public class ComplexAttributeConverterFactoryTest extends TestCase {
                                 null),
                         null);
         Geometry geometry2 = Converters.convert(geoatt, Geometry.class);
-        assertTrue(geometry == geometry2);
+        assertSame(geometry, geometry2);
     }
 
     /** Checks that an attribute value is correctly converted to the expected type. */

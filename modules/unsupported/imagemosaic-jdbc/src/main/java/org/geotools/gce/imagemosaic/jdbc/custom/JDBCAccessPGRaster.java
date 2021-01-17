@@ -17,7 +17,7 @@
 
 package org.geotools.gce.imagemosaic.jdbc.custom;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.sql.Connection;
@@ -82,9 +82,7 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
      */
     public void initialize() throws IOException {
 
-        Connection con = null;
-        try {
-            con = getConnection();
+        try (Connection con = getConnection()) {
 
             if (con.getAutoCommit()) {
                 con.setAutoCommit(false);
@@ -100,9 +98,12 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
             */
             populateStatementsMap(getConfig().getCoverageName(), con);
             /*
-            TODO nat changes - GEOT-4525. I am  not sure if this is the best place for the next statement, as
-            if configurations have been already defined and were not recalculated, we will be just overwriting
-            existing configuration, albeit with the same values. But for simplicity sake, it is probably better
+            TODO nat changes - GEOT-4525. I am  not sure if this is the best place for the next
+             statement, as
+            if configurations have been already defined and were not recalculated, we will be
+            just overwriting
+            existing configuration, albeit with the same values. But for simplicity sake, it is
+            probably better
              to leave it here...
              */
             con.commit();
@@ -115,13 +116,8 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
 
             LOGGER.severe(e.getMessage());
             throw new IOException(e);
-        } finally {
-            try {
-                // con.rollback();
-                if (con != null) con.close();
-            } catch (SQLException e1) {
-            }
         }
+        // con.rollback();
 
         if (getLevelInfos().isEmpty()) {
             String msg = "No level available for " + getConfig().getCoverageName();
@@ -130,7 +126,7 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
         }
 
         // sort levelinfos
-        SortedSet<ImageLevelInfo> sortColl = new TreeSet<ImageLevelInfo>();
+        SortedSet<ImageLevelInfo> sortColl = new TreeSet<>();
         sortColl.addAll(getLevelInfos());
         getLevelInfos().clear();
         getLevelInfos().addAll(sortColl);
@@ -162,7 +158,7 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
             throws IOException {
         Date start = new Date();
         Connection con = null;
-        List<ImageDecoderThread> threads = new ArrayList<ImageDecoderThread>();
+        List<ImageDecoderThread> threads = new ArrayList<>();
         ExecutorService pool = getExecutorServivicePool();
 
         String gridStatement = statementMap.get(levelInfo);
@@ -407,7 +403,7 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
 
         try (PreparedStatement stmt =
                 con.prepareStatement(getConfig().getSqlUpdateMosaicStatement())) {
-            List<ImageLevelInfo> toBeRemoved = new ArrayList<ImageLevelInfo>();
+            List<ImageLevelInfo> toBeRemoved = new ArrayList<>();
 
             for (ImageLevelInfo li : getLevelInfos()) {
                 if (li.getCoverageName().equals(coverageName) == false) {
@@ -509,7 +505,7 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
         try (PreparedStatement stmt =
                 con.prepareStatement(getConfig().getSqlUpdateResStatement())) {
 
-            List<ImageLevelInfo> toBeRemoved = new ArrayList<ImageLevelInfo>();
+            List<ImageLevelInfo> toBeRemoved = new ArrayList<>();
 
             for (ImageLevelInfo li : getLevelInfos()) {
                 if (li.getCoverageName().equals(coverageName) == false) {
@@ -587,7 +583,7 @@ public class JDBCAccessPGRaster extends JDBCAccessCustom {
     }
 
     private void populateStatementsMap(String coverageName, Connection con) throws SQLException {
-        statementMap = new HashMap<ImageLevelInfo, String>();
+        statementMap = new HashMap<>();
 
         for (ImageLevelInfo li : getLevelInfos()) {
             if (li.getCoverageName().equals(coverageName) == false) {

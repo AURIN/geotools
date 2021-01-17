@@ -16,7 +16,10 @@
  */
 package org.geotools.data.elasticsearch;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +72,7 @@ public class ElasticAttributeTest {
         srid = 10;
         order = 1;
         dateFormat = "yyyy-mm-dd";
-        validDateFormats = new ArrayList<String>();
+        validDateFormats = new ArrayList<>();
         validDateFormats.add(dateFormat);
         analyzed = true;
         stored = true;
@@ -120,7 +123,7 @@ public class ElasticAttributeTest {
     @Test
     public void testEquals() {
         assertEquals(attr, new ElasticAttribute("theName"));
-        assertTrue(!attr.equals(new ElasticAttribute("name")));
+        assertFalse(attr.equals(new ElasticAttribute("name")));
     }
 
     @Test
@@ -158,6 +161,6 @@ public class ElasticAttributeTest {
         attr.setCustomName(customName);
         assertEquals(attr.getCustomName(), normalizedName);
         attr.setCustomName(null);
-        assertEquals(attr.getCustomName(), null);
+        assertNull(attr.getCustomName());
     }
 }

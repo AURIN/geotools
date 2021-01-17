@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -91,34 +90,34 @@ public class FunctionExpressionImplTest extends TestCase {
     }
 
     public void testGetParameters() {
-        final List expected = Collections.singletonList(new LiteralExpressionImpl(10d));
+        final List<Expression> expected = Collections.singletonList(new LiteralExpressionImpl(10d));
         // do not try this at home
         function.params = expected;
         assertEquals(expected, function.getParameters());
     }
 
     public void testSetParameters() {
-        final List expected = Collections.singletonList(new LiteralExpressionImpl(10d));
+        final List<Expression> expected = Collections.singletonList(new LiteralExpressionImpl(10d));
         // do not try this at home
         function.setParameters(expected);
         assertEquals(expected, function.params);
     }
 
     public void testGetArgs() {
-        final List expected = Collections.singletonList(new LiteralExpressionImpl(10d));
+        final List<Expression> expected = Collections.singletonList(new LiteralExpressionImpl(10d));
         function.setParameters(expected);
         List<Expression> actual = function.getParameters();
         assertEquals(expected, actual);
     }
 
     public void testSetArgs() {
-        final List expected = Collections.singletonList(new LiteralExpressionImpl(10d));
+        final List<Expression> expected = Collections.singletonList(new LiteralExpressionImpl(10d));
         function.setParameters(expected);
         assertEquals(expected, function.params);
     }
 
     public void testGetArgCount() {
-        final List expected = Collections.singletonList(new LiteralExpressionImpl(10d));
+        final List<Expression> expected = Collections.singletonList(new LiteralExpressionImpl(10d));
         function.setParameters(expected);
         assertEquals(1, function.getFunctionName().getArgumentCount());
     }
@@ -132,11 +131,10 @@ public class FunctionExpressionImplTest extends TestCase {
             throws IOException, ClassNotFoundException, InstantiationException,
                     IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-        List functionClasses = loadFunctionClasses();
+        List<Class<?>> functionClasses = loadFunctionClasses();
 
-        List errors = new LinkedList();
-        for (Iterator it = functionClasses.iterator(); it.hasNext(); ) {
-            Class functionClass = (Class) it.next();
+        List<String> errors = new LinkedList<>();
+        for (Class<?> functionClass : functionClasses) {
             Function function = (Function) functionClass.getDeclaredConstructor().newInstance();
             testFunction(function, errors);
         }
@@ -155,8 +153,8 @@ public class FunctionExpressionImplTest extends TestCase {
         StringBuffer sb =
                 new StringBuffer("Some function expression implementations violates contract:\n");
         int errorCount = 1;
-        for (Iterator it = errors.iterator(); it.hasNext(); ) {
-            String error = (String) it.next();
+        for (Object o : errors) {
+            String error = (String) o;
             sb.append(errorCount++ + " - ");
             sb.append(error);
             sb.append("\n");
@@ -164,7 +162,7 @@ public class FunctionExpressionImplTest extends TestCase {
         return sb.toString();
     }
 
-    private void testFunction(Function function, List errors)
+    private void testFunction(Function function, List<String> errors)
             throws InstantiationException, IllegalAccessException, NoSuchMethodException,
                     InvocationTargetException {
         final String functionClass = function.getClass().getName();
@@ -204,7 +202,7 @@ public class FunctionExpressionImplTest extends TestCase {
     }
 
     private void addExceptionError(
-            List errors, final String functionClass, final String method, Exception e) {
+            List<String> errors, final String functionClass, final String method, Exception e) {
         /*
          * StringWriter stringWriter = new StringWriter(); e.printStackTrace(new
          * PrintWriter(stringWriter));
@@ -224,7 +222,7 @@ public class FunctionExpressionImplTest extends TestCase {
             argCount = 5; // we'll try 5
         }
 
-        final List<Expression> expected = new ArrayList<Expression>();
+        final List<Expression> expected = new ArrayList<>();
 
         for (int i = 0; i < argCount; i++) {
             AttributeExpressionImpl ex = new AttributeExpressionImpl("attName");
@@ -248,7 +246,7 @@ public class FunctionExpressionImplTest extends TestCase {
                             + ".getParameters() returned a wrong result when parameters were set through setArgs(Expression[])");
         }
 
-        function = (FunctionExpression) function.getClass().getDeclaredConstructor().newInstance();
+        function = function.getClass().getDeclaredConstructor().newInstance();
         function.setParameters(expected);
 
         List<Expression> returnedArgs = function.getParameters();
@@ -257,7 +255,7 @@ public class FunctionExpressionImplTest extends TestCase {
                     functionClass
                             + ".getParameters() returns null then arguments set through setParameters()");
         } else {
-            returnedParams = new ArrayList<Expression>(expected);
+            returnedParams = new ArrayList<>(expected);
 
             if (!expected.equals(returnedParams)) {
                 errors.add(functionClass + ".getParameters() incompatible with getParameters()");
@@ -269,7 +267,7 @@ public class FunctionExpressionImplTest extends TestCase {
         }
     }
 
-    private List loadFunctionClasses() throws IOException, ClassNotFoundException {
+    private List<Class<?>> loadFunctionClasses() throws IOException, ClassNotFoundException {
         final String spiDefinitionResource =
                 "/META-INF/services/org.opengis.filter.expression.Function";
         InputStream in = getClass().getResourceAsStream(spiDefinitionResource);
@@ -277,11 +275,11 @@ public class FunctionExpressionImplTest extends TestCase {
             throw new FileNotFoundException(spiDefinitionResource);
         }
 
-        List functionClasses = new LinkedList();
+        List<Class<?>> functionClasses = new LinkedList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String className;
         while ((className = reader.readLine()) != null) {
-            Object functionClazz = Class.forName(className);
+            Class<?> functionClazz = Class.forName(className);
             functionClasses.add(functionClazz);
         }
         return functionClasses;

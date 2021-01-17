@@ -90,13 +90,13 @@ public class ImageMosaicJDBCReader extends AbstractGridCoverage2DReader {
 
     // class initializer
     static {
-        LEFTDirections = new HashSet<AxisDirection>();
+        LEFTDirections = new HashSet<>();
         LEFTDirections.add(AxisDirection.DISPLAY_LEFT);
         LEFTDirections.add(AxisDirection.EAST);
         LEFTDirections.add(AxisDirection.GEOCENTRIC_X);
         LEFTDirections.add(AxisDirection.COLUMN_POSITIVE);
 
-        UPDirections = new HashSet<AxisDirection>();
+        UPDirections = new HashSet<>();
         UPDirections.add(AxisDirection.DISPLAY_UP);
         UPDirections.add(AxisDirection.NORTH);
         UPDirections.add(AxisDirection.GEOCENTRIC_Y);
@@ -243,8 +243,9 @@ public class ImageMosaicJDBCReader extends AbstractGridCoverage2DReader {
     private void logRequestParams(GeneralParameterValue[] params) {
         LOGGER.info("----PARAMS START-------");
 
-        for (int i = 0; i < params.length; i++) {
-            Parameter<Object> p = (Parameter<Object>) params[i];
+        for (GeneralParameterValue param : params) {
+            @SuppressWarnings("unchecked")
+            Parameter<Object> p = (Parameter<Object>) param;
             LOGGER.info(p.getDescriptor().getName().toString() + ": " + p.getValue());
         }
 
@@ -279,12 +280,13 @@ public class ImageMosaicJDBCReader extends AbstractGridCoverage2DReader {
         // Checking params
         //
         // /////////////////////////////////////////////////////////////////////
-        state.setBackgroundColor((Color) ImageMosaicJDBCFormat.BACKGROUND_COLOR.getDefaultValue());
+        state.setBackgroundColor(ImageMosaicJDBCFormat.BACKGROUND_COLOR.getDefaultValue());
         state.setOutputTransparentColor(
-                (Color) ImageMosaicJDBCFormat.OUTPUT_TRANSPARENT_COLOR.getDefaultValue());
+                ImageMosaicJDBCFormat.OUTPUT_TRANSPARENT_COLOR.getDefaultValue());
 
         if (params != null) {
             for (GeneralParameterValue generalParameterValue : params) {
+                @SuppressWarnings("unchecked")
                 Parameter<Object> param = (Parameter<Object>) generalParameterValue;
 
                 if (param.getDescriptor()

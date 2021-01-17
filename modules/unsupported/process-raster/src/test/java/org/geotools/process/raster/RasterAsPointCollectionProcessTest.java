@@ -19,7 +19,10 @@ package org.geotools.process.raster;
 
 import static org.junit.Assert.assertNotEquals;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
@@ -318,13 +321,12 @@ public class RasterAsPointCollectionProcessTest {
         MathTransform2D w2g =
                 coverage.getGridGeometry().getCRSToGrid2D(PixelOrientation.UPPER_LEFT);
         // Iterator on the FeatureCollection
-        SimpleFeatureIterator it = collection.features();
         // Iterator on the input image
-        RandomIter imageIterator = RandomIterFactory.create(coverage.getRenderedImage(), null);
         // Boolean indicating that the TargetCRS is not null
-        boolean crsExists = targetCRS != null;
         // Cycle on the Collection
-        try {
+        try (SimpleFeatureIterator it = collection.features()) {
+            RandomIter imageIterator = RandomIterFactory.create(coverage.getRenderedImage(), null);
+            boolean crsExists = targetCRS != null;
             while (it.hasNext()) {
                 // Selection of the feature
                 SimpleFeature ft = it.next();
@@ -352,10 +354,6 @@ public class RasterAsPointCollectionProcessTest {
                     double angle = (double) ft.getAttribute("gridConvergenceAngleCorrection");
                     Assert.assertTrue(angle != 0);
                 }
-            }
-        } finally {
-            if (it != null) {
-                it.close();
             }
         }
     }

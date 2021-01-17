@@ -219,6 +219,7 @@ public class ImageMosaicDirectoryWalker extends ImageMosaicWalker {
                         finalFilter,
                         this,
                         new ImageMosaicFileFeatureConsumer.ImageMosaicFileConsumer());
+
             } else {
                 LOGGER.log(Level.INFO, "No files to process!");
             }

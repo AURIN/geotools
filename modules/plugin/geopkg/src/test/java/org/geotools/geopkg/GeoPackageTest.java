@@ -22,7 +22,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -92,6 +93,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.sqlite.SQLiteConfig;
@@ -215,28 +217,19 @@ public class GeoPackageTest {
 
     boolean doesEntryExists(String table, Entry entry) throws Exception {
         boolean exists = false;
-        Connection cx = geopkg.getDataSource().getConnection();
-        try {
+        try (Connection cx = geopkg.getDataSource().getConnection()) {
             String sql = String.format("SELECT * FROM %s WHERE table_name = ?", table);
             SqlUtil.PreparedStatementBuilder psb =
                     SqlUtil.prepare(cx, sql).set(entry.getTableName());
-            PreparedStatement ps = psb.log(Level.FINE).statement();
-            try {
-                ResultSet rs = ps.executeQuery();
-                try {
+            try (PreparedStatement ps = psb.log(Level.FINE).statement()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         exists = true;
                     }
-                } finally {
-                    rs.close();
                 }
-            } finally {
-                ps.close();
             }
         } catch (Exception e) {
             fail(e.getMessage());
-        } finally {
-            cx.close();
         }
         return exists;
     }
@@ -256,17 +249,11 @@ public class GeoPackageTest {
                     String.format(
                             "SELECT srs_name FROM %s WHERE srs_id = ?", GeoPackage.SPATIAL_REF_SYS);
             SqlUtil.PreparedStatementBuilder psb = SqlUtil.prepare(cx, sql).set(2000);
-            PreparedStatement ps = psb.log(Level.FINE).statement();
-            try {
-                ResultSet rs = ps.executeQuery();
-                try {
+            try (PreparedStatement ps = psb.log(Level.FINE).statement()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     assertTrue(rs.next());
                     assertEquals("epsg:2000", rs.getString(1));
-                } finally {
-                    rs.close();
                 }
-            } finally {
-                ps.close();
             }
         } catch (Exception e) {
             fail(e.getMessage());
@@ -647,7 +634,8 @@ public class GeoPackageTest {
 
         assertTrue(geopkg.hasSpatialIndex(entry));
 
-        Set ids = geopkg.searchSpatialIndex(entry, 590230.0, 4915038.0, 590234.0, 4915040.0);
+        Set<Identifier> ids =
+                geopkg.searchSpatialIndex(entry, 590230.0, 4915038.0, 590234.0, 4915040.0);
         try (SimpleFeatureReader sfr = geopkg.reader(entry, ff.id(ids), null)) {
             assertTrue(sfr.hasNext());
             assertEquals("bugsites.1", sfr.next().getID().toString());
@@ -715,7 +703,7 @@ public class GeoPackageTest {
         geopkg.create(e);
         assertTileEntry(e);
 
-        List<Tile> tiles = new ArrayList();
+        List<Tile> tiles = new ArrayList<>();
         tiles.add(new Tile(0, 0, 0, new byte[] {0}));
         tiles.add(new Tile(1, 0, 0, new byte[] {1}));
         tiles.add(new Tile(1, 0, 1, new byte[] {2}));
@@ -817,7 +805,7 @@ public class GeoPackageTest {
                 new GridGeometry2D(
                         new GridEnvelope2D(new Rectangle(1536, 768)),
                         new ReferencedEnvelope(-180, 180, -90, 90, CRS.decode("EPSG:4326", true)));
-        parameters[0] = new Parameter<GridGeometry2D>(AbstractGridFormat.READ_GRIDGEOMETRY2D, gg);
+        parameters[0] = new Parameter<>(AbstractGridFormat.READ_GRIDGEOMETRY2D, gg);
         GridCoverage2D gc = reader.read("bluemarble_tif_tiles", parameters);
         BufferedImage img = ((PlanarImage) gc.getRenderedImage()).getAsBufferedImage();
 
@@ -848,8 +836,7 @@ public class GeoPackageTest {
     }
 
     void assertContentEntry(Entry entry) throws Exception {
-        Connection cx = geopkg.getDataSource().getConnection();
-        try {
+        try (Connection cx = geopkg.getDataSource().getConnection()) {
             PreparedStatement ps =
                     cx.prepareStatement("SELECT * FROM gpkg_contents WHERE table_name = ?");
             ps.setString(1, entry.getTableName());
@@ -868,16 +855,13 @@ public class GeoPackageTest {
 
             rs.close();
             ps.close();
-        } finally {
-            cx.close();
         }
     }
 
     void assertFeatureEntry(FeatureEntry entry) throws Exception {
         assertContentEntry(entry);
 
-        Connection cx = geopkg.getDataSource().getConnection();
-        try {
+        try (Connection cx = geopkg.getDataSource().getConnection()) {
             PreparedStatement ps =
                     cx.prepareStatement("SELECT * FROM gpkg_geometry_columns WHERE table_name = ?");
             ps.setString(1, entry.getTableName());
@@ -895,16 +879,13 @@ public class GeoPackageTest {
 
             rs.close();
             ps.close();
-        } finally {
-            cx.close();
         }
     }
 
     void assertTileEntry(TileEntry entry) throws Exception {
         assertContentEntry(entry);
 
-        Connection cx = geopkg.getDataSource().getConnection();
-        try {
+        try (Connection cx = geopkg.getDataSource().getConnection()) {
             PreparedStatement ps =
                     cx.prepareStatement(
                             "SELECT count(*) from gpkg_tile_matrix WHERE table_name = ?");
@@ -940,8 +921,6 @@ public class GeoPackageTest {
 
             rs.close();
             ps.close();
-        } finally {
-            cx.close();
         }
     }
 

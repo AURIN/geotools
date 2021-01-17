@@ -20,7 +20,7 @@ import com.sun.media.jai.codec.ByteArraySeekableStream;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageDecoder;
 import com.sun.media.jai.codec.SeekableStream;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -71,7 +71,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
     /** Logger. */
     protected static final Logger LOGGER = Logging.getLogger(JDBCAccessBase.class);
 
-    private List<ImageLevelInfo> levelInfos = new ArrayList<ImageLevelInfo>();
+    private List<ImageLevelInfo> levelInfos = new ArrayList<>();
 
     protected Config config;
 
@@ -110,10 +110,8 @@ abstract class JDBCAccessBase implements JDBCAccess {
      * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccess#initialize()
      */
     public void initialize() throws IOException {
-        Connection con = null;
 
-        try {
-            con = dataSource.getConnection();
+        try (Connection con = dataSource.getConnection()) {
 
             if (con.getAutoCommit()) {
                 con.setAutoCommit(false);
@@ -133,11 +131,6 @@ abstract class JDBCAccessBase implements JDBCAccess {
 
             LOGGER.severe(e.getMessage());
             throw new IOException(e);
-        } finally {
-            try {
-                if (con != null) con.close();
-            } catch (SQLException e1) {
-            }
         }
 
         if (levelInfos.isEmpty()) {
@@ -147,9 +140,9 @@ abstract class JDBCAccessBase implements JDBCAccess {
         }
 
         // sort levelinfos
-        SortedSet<ImageLevelInfo> sortColl = new TreeSet<ImageLevelInfo>();
+        SortedSet<ImageLevelInfo> sortColl = new TreeSet<>();
         sortColl.addAll(levelInfos);
-        levelInfos = new ArrayList<ImageLevelInfo>();
+        levelInfos = new ArrayList<>();
         levelInfos.addAll(sortColl);
     }
 
@@ -274,10 +267,8 @@ abstract class JDBCAccessBase implements JDBCAccess {
                 imageLevelInfo.setSrsId(getSRSID(imageLevelInfo, con));
                 imageLevelInfo.setCrs(getCRS(imageLevelInfo, con));
             }
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             throw (e);
-        } catch (IOException e1) {
-            throw (e1);
         } finally {
             if (res != null) {
                 res.close();
@@ -351,7 +342,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
     void calculateExtentsFromDB(String coverageName, Connection con)
             throws SQLException, IOException {
         try (PreparedStatement stmt = con.prepareStatement(config.getSqlUpdateMosaicStatement())) {
-            List<ImageLevelInfo> toBeRemoved = new ArrayList<ImageLevelInfo>();
+            List<ImageLevelInfo> toBeRemoved = new ArrayList<>();
 
             for (ImageLevelInfo li : levelInfos) {
                 if (li.getCoverageName().equals(coverageName) == false) {
@@ -418,7 +409,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
     void calculateResolutionsFromDB(String coverageName, Connection con)
             throws SQLException, IOException {
         try (PreparedStatement stmt = con.prepareStatement(config.getSqlUpdateResStatement())) {
-            List<ImageLevelInfo> toBeRemoved = new ArrayList<ImageLevelInfo>();
+            List<ImageLevelInfo> toBeRemoved = new ArrayList<>();
 
             for (ImageLevelInfo li : levelInfos) {
                 if (li.getCoverageName().equals(coverageName) == false) {
@@ -510,11 +501,11 @@ abstract class JDBCAccessBase implements JDBCAccess {
             GridCoverageFactory coverageFactory)
             throws IOException {
         Date start = new Date();
-        List<ImageDecoderThread> threads = new ArrayList<ImageDecoderThread>();
+        List<ImageDecoderThread> threads = new ArrayList<>();
         ExecutorService pool = getExecutorServivicePool();
 
         String statementString = getGridSelectStatement(levelInfo);
-        Queue<Future<?>> runResults = new LinkedList<Future<?>>();
+        Queue<Future<?>> runResults = new LinkedList<>();
 
         try (Connection con = dataSource.getConnection();
                 PreparedStatement s = con.prepareStatement(statementString)) {

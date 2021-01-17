@@ -35,6 +35,7 @@ public class WFSFeatureCollectionEncodingTest extends TestCase {
     FeatureCollectionType fc;
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void setUp() throws Exception {
         fc = WfsFactory.eINSTANCE.createFeatureCollectionType();
         DefaultFeatureCollection features = new DefaultFeatureCollection();
@@ -78,11 +79,9 @@ public class WFSFeatureCollectionEncodingTest extends TestCase {
         org.geotools.wfs.v1_0.WFSConfiguration_1_0 configuration =
                 new org.geotools.wfs.v1_0.WFSConfiguration_1_0();
         configuration.getProperties().add(GMLConfiguration.OPTIMIZED_ENCODING);
-        ((GMLConfiguration) configuration.getDependency(GMLConfiguration.class))
-                .setForceDecimalEncoding(true);
-        ((GMLConfiguration) configuration.getDependency(GMLConfiguration.class)).setNumDecimals(4);
-        ((GMLConfiguration) configuration.getDependency(GMLConfiguration.class))
-                .setPadWithZeros(true);
+        configuration.getDependency(GMLConfiguration.class).setForceDecimalEncoding(true);
+        configuration.getDependency(GMLConfiguration.class).setNumDecimals(4);
+        configuration.getDependency(GMLConfiguration.class).setPadWithZeros(true);
         Encoder e = new Encoder(configuration);
         e.getNamespaces().declarePrefix("geotools", "http://geotools.org");
         e.setIndenting(true);
@@ -121,15 +120,11 @@ public class WFSFeatureCollectionEncodingTest extends TestCase {
         org.geotools.wfs.v1_1.WFSConfiguration configuration =
                 new org.geotools.wfs.v1_1.WFSConfiguration();
         configuration.getProperties().add(GMLConfiguration.OPTIMIZED_ENCODING);
-        ((org.geotools.gml3.GMLConfiguration)
-                        configuration.getDependency(org.geotools.gml3.GMLConfiguration.class))
+        configuration
+                .getDependency(org.geotools.gml3.GMLConfiguration.class)
                 .setForceDecimalEncoding(true);
-        ((org.geotools.gml3.GMLConfiguration)
-                        configuration.getDependency(org.geotools.gml3.GMLConfiguration.class))
-                .setNumDecimals(4);
-        ((org.geotools.gml3.GMLConfiguration)
-                        configuration.getDependency(org.geotools.gml3.GMLConfiguration.class))
-                .setPadWithZeros(true);
+        configuration.getDependency(org.geotools.gml3.GMLConfiguration.class).setNumDecimals(4);
+        configuration.getDependency(org.geotools.gml3.GMLConfiguration.class).setPadWithZeros(true);
         Encoder e = new Encoder(configuration);
         e.getNamespaces().declarePrefix("geotools", "http://geotools.org");
         e.setIndenting(true);
@@ -146,6 +141,7 @@ public class WFSFeatureCollectionEncodingTest extends TestCase {
                         .getAttribute("gml:id"));
     }
 
+    @SuppressWarnings("unchecked")
     public void testEncodeFeatureCollectionMultipleFeatureTypes() throws Exception {
         DefaultFeatureCollection features = new DefaultFeatureCollection();
 

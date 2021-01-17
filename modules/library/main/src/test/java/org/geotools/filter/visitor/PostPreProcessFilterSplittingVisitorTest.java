@@ -33,6 +33,7 @@ import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 
 public class PostPreProcessFilterSplittingVisitorTest
@@ -95,7 +96,7 @@ public class PostPreProcessFilterSplittingVisitorTest
     }
 
     public void testMassOrFilter() throws Exception {
-        List filters = new ArrayList();
+        List<Filter> filters = new ArrayList<>();
         for (int i = 0; i < 10000; i++) {
             filters.add(ff.equals(ff.property(nameAtt), ff.literal("" + i)));
         }
@@ -144,7 +145,7 @@ public class PostPreProcessFilterSplittingVisitorTest
     }
 
     public void testVisitFidFilter() throws Exception {
-        HashSet ids = new HashSet();
+        HashSet<FeatureId> ids = new HashSet<>();
         ids.add(ff.featureId("david"));
         Filter filter = ff.id(ids);
         visitor = newVisitor(new FilterCapabilities(Id.class));
@@ -157,7 +158,7 @@ public class PostPreProcessFilterSplittingVisitorTest
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void testVisitIdFilterWithNoIdCapabilities() throws Exception {
         // Id Filter
-        HashSet ids = new HashSet();
+        HashSet<FeatureId> ids = new HashSet<>();
         ids.add(ff.featureId("david"));
         Filter idFilter = ff.id(ids);
 
@@ -317,7 +318,7 @@ public class PostPreProcessFilterSplittingVisitorTest
 
                             public Filter getUpdateFilter(String attributePath) {
                                 if (attributePath.equals("eventtype")) {
-                                    HashSet ids = new HashSet();
+                                    HashSet<FeatureId> ids = new HashSet<>();
                                     ids.add(ff.featureId("fid"));
                                     return ff.id(ids);
                                 }
@@ -327,7 +328,7 @@ public class PostPreProcessFilterSplittingVisitorTest
 
         f.accept(visitor, null);
 
-        HashSet ids = new HashSet();
+        HashSet<FeatureId> ids = new HashSet<>();
         ids.add(ff.featureId("fid"));
 
         assertEquals(f, visitor.getFilterPost());

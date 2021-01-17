@@ -21,7 +21,7 @@ import static java.awt.Color.GREEN;
 import static java.awt.Color.RED;
 import static java.awt.Color.WHITE;
 
-import java.awt.*;
+import java.awt.Color;
 import junit.framework.TestCase;
 import org.geotools.filter.ConstantExpression;
 import org.geotools.util.Converter;
@@ -135,7 +135,7 @@ public class ColorConverterFactoryTest extends TestCase {
 
     Color convert(Object value) throws Exception {
         Converter converter = factory.createConverter(value.getClass(), Color.class, null);
-        return (Color) converter.convert(value, Color.class);
+        return converter.convert(value, Color.class);
     }
 
     public void testRegisteredWithConverters() {

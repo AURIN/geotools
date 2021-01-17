@@ -17,6 +17,8 @@
  */
 package org.geotools.data.mongodb;
 
+import static org.junit.Assert.assertNotEquals;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,10 +38,20 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.GeometryBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.*;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Not;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
@@ -69,10 +81,9 @@ public abstract class MongoDataStoreTest extends MongoTestSupport {
     }
 
     public void testGetFeatureReader() throws Exception {
-        SimpleFeatureReader reader =
+        try (SimpleFeatureReader reader =
                 (SimpleFeatureReader)
-                        dataStore.getFeatureReader(new Query("ft1"), Transaction.AUTO_COMMIT);
-        try {
+                        dataStore.getFeatureReader(new Query("ft1"), Transaction.AUTO_COMMIT)) {
             for (int i = 0; i < 3; i++) {
                 assertTrue(reader.hasNext());
                 SimpleFeature f = reader.next();
@@ -80,8 +91,6 @@ public abstract class MongoDataStoreTest extends MongoTestSupport {
                 assertFeature(f);
             }
             assertFalse(reader.hasNext());
-        } finally {
-            reader.close();
         }
     }
 
@@ -258,7 +267,7 @@ public abstract class MongoDataStoreTest extends MongoTestSupport {
         SimpleFeatureIterator it = features.features();
         while (it.hasNext()) {
             SimpleFeature f = it.next();
-            assertFalse("one".equals(pn.evaluate(f)));
+            assertNotEquals("one", pn.evaluate(f));
         }
     }
 
@@ -355,7 +364,7 @@ public abstract class MongoDataStoreTest extends MongoTestSupport {
         assertEquals(2, features.size());
         while (it.hasNext()) {
             SimpleFeature f = it.next();
-            assertFalse(pn.evaluate(f).equals("zero"));
+            assertNotEquals("zero", pn.evaluate(f));
         }
     }
 

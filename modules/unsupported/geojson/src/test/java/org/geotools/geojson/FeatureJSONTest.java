@@ -298,7 +298,7 @@ public class FeatureJSONTest extends GeoJSONTestSupport {
                                                 + " }")));
 
         assertNotNull(f);
-        assertTrue(f.getDefaultGeometry() == null);
+        assertNull(f.getDefaultGeometry());
 
         assertEquals(1, ((Number) f.getAttribute("int")).intValue());
         assertEquals(0.1, ((Number) f.getAttribute("double")).doubleValue());
@@ -901,6 +901,7 @@ public class FeatureJSONTest extends GeoJSONTestSupport {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testFeatureCollectionWithoutGeometryReadWriteFromFeatureSource() throws Exception {
         String json =
                 strip(

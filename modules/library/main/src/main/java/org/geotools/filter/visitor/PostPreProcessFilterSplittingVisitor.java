@@ -134,20 +134,21 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
      * The stack holding the bits of the filter that are not processable by something with the given
      * {@link FilterCapabilities}
      */
-    protected Stack postStack = new Stack();
+    /* Filter and Expression do not share a common ancestor, hence, Stack<Object> */
+    protected Stack<Object> postStack = new Stack<>();
 
     /**
      * The stack holding the bits of the filter that <b>are</b> processable by something with the
      * given {@link FilterCapabilities}
      */
-    protected Stack preStack = new Stack();
+    protected Stack<Object> preStack = new Stack<>();
 
     /**
      * Operates similar to postStack. When a update is determined to affect an attribute expression
      * the update filter is pushed on to the stack, then ored with the filter that contains the
      * expression.
      */
-    private Set changedStack = new HashSet();
+    private Set<Object> changedStack = new HashSet<>();
 
     /** The given filterCapabilities that we're splitting on. */
     protected FilterCapabilities fcs = null;
@@ -246,7 +247,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
                 updateFilter = next;
                 break;
             } else {
-                updateFilter = (Filter) ff.or(updateFilter, next);
+                updateFilter = ff.or(updateFilter, next);
             }
         }
         if (updateFilter == Filter.INCLUDE || f == Filter.INCLUDE) return Filter.INCLUDE;
@@ -510,7 +511,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
     protected void visitBinarySpatialOperator(BinarySpatialOperator filter) {
         if (original == null) original = filter;
 
-        Class[] spatialOps =
+        @SuppressWarnings("unchecked")
+        Class<? extends Filter>[] spatialOps =
                 new Class[] {
                     Beyond.class,
                     Contains.class,
@@ -524,9 +526,9 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
                     Within.class
                 };
 
-        for (int i = 0; i < spatialOps.length; i++) {
-            if (spatialOps[i].isAssignableFrom(filter.getClass())) {
-                if (!supports(spatialOps[i])) {
+        for (Class<? extends Filter> spatialOp : spatialOps) {
+            if (spatialOp.isAssignableFrom(filter.getClass())) {
+                if (!supports(spatialOp)) {
                     postStack.push(filter);
                     return;
                 } else {
@@ -541,8 +543,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
         int i = postStack.size();
 
         Expression leftGeometry, rightGeometry;
-        leftGeometry = ((BinarySpatialOperator) filter).getExpression1();
-        rightGeometry = ((BinarySpatialOperator) filter).getExpression2();
+        leftGeometry = filter.getExpression1();
+        rightGeometry = filter.getExpression2();
 
         if (leftGeometry == null || rightGeometry == null) {
             postStack.push(filter);
@@ -779,8 +781,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
                             + parent.getTypeName());
         }
         if (transactionAccessor != null) {
-            Filter updateFilter =
-                    (Filter) transactionAccessor.getUpdateFilter(expression.getPropertyName());
+            Filter updateFilter = transactionAccessor.getUpdateFilter(expression.getPropertyName());
             if (updateFilter != null) {
                 changedStack.add(updateFilter);
                 preStack.push(updateFilter);
@@ -871,7 +872,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
         int j = preStack.size();
 
         for (int k = 0; k < expression.getParameters().size(); k++) {
-            ((Expression) expression.getParameters().get(k)).accept(this, null);
+            expression.getParameters().get(k).accept(this, null);
 
             if (i < postStack.size()) {
                 while (j < preStack.size()) preStack.pop();
@@ -900,11 +901,11 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
         // ~(a|b) == (~a + ~b) modus ponens
         // ~~(a|b) == ~(~a + ~b) substitution
         // a|b == ~(~a + ~b) negative simpilification
-        Iterator i = filter.getChildren().iterator();
-        List translated = new ArrayList();
+        Iterator<Filter> i = filter.getChildren().iterator();
+        List<Filter> translated = new ArrayList<>();
 
         while (i.hasNext()) {
-            Filter f = (Filter) i.next();
+            Filter f = i.next();
 
             if (f instanceof Not) {
                 // simplify it

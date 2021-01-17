@@ -37,14 +37,14 @@ public class CommonsConverterFactoryTest extends TestCase {
     public void testStringNumberConversion() throws Exception {
         // test with integers
         assertEquals(12, convert("12", Integer.class));
-        assertEquals(null, convert("12.0", Integer.class));
-        assertEquals(null, convert("12.5", Integer.class));
-        assertEquals(null, convert(Long.MAX_VALUE + "", Integer.class));
+        assertNull(convert("12.0", Integer.class));
+        assertNull(convert("12.5", Integer.class));
+        assertNull(convert(Long.MAX_VALUE + "", Integer.class));
 
         // test with longs
         assertEquals(Long.MAX_VALUE, convert(Long.MAX_VALUE + "", Long.class));
-        assertEquals(null, convert("1e100", Long.class));
-        assertEquals(null, convert("12.5", Long.class));
+        assertNull(convert("1e100", Long.class));
+        assertNull(convert("12.5", Long.class));
 
         // test with doubles
         assertEquals((double) Long.MAX_VALUE, convert(Long.MAX_VALUE + "", Double.class));
@@ -79,7 +79,7 @@ public class CommonsConverterFactoryTest extends TestCase {
                         .convert("2011-08-02", Date.class));
     }
 
-    Object convert(Object source, Class target) throws Exception {
+    Object convert(Object source, Class<?> target) throws Exception {
         return factory.createConverter(source.getClass(), target, null).convert(source, target);
     }
 

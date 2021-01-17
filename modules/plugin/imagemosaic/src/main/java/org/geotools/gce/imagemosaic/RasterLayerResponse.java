@@ -23,7 +23,10 @@ import it.geosolutions.jaiext.range.NoDataContainer;
 import it.geosolutions.jaiext.range.Range;
 import it.geosolutions.jaiext.range.RangeFactory;
 import it.geosolutions.jaiext.utilities.ImageLayout2;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -407,7 +410,7 @@ public class RasterLayerResponse {
 
             // STEP 1 collect all the mosaics from each single dimension
             LOGGER.fine("Producing the final mosaic, step 1, loop through granule collectors");
-            final List<MosaicElement> mosaicInputs = new ArrayList<MosaicElement>();
+            final List<MosaicElement> mosaicInputs = new ArrayList<>();
             SubmosaicProducer first = null; // we take this apart to steal some val
             int size = 0;
             for (SubmosaicProducer collector : granuleCollectors) {
@@ -415,7 +418,7 @@ public class RasterLayerResponse {
                     LOGGER.fine("Submosaic producer being called: " + collector.toString());
                 }
                 final List<MosaicElement> preparedMosaic = collector.createMosaic();
-                if (preparedMosaic.size() > 0
+                if (!preparedMosaic.isEmpty()
                         && !preparedMosaic.stream().allMatch(p -> p == null)) {
                     size += preparedMosaic.size();
                     mosaicInputs.addAll(preparedMosaic);
@@ -1144,7 +1147,7 @@ public class RasterLayerResponse {
             }
         }
         final GridSampleDimension[] bands = new GridSampleDimension[numBands];
-        Set<String> bandNames = new HashSet<String>();
+        Set<String> bandNames = new HashSet<>();
         // setting bands names.
         for (int i = 0; i < numBands; i++) {
             ColorInterpretation colorInterpretation = null;
@@ -1241,7 +1244,7 @@ public class RasterLayerResponse {
         }
 
         // creating the final coverage by keeping into account the fact that we
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         if (granulesPaths != null) {
             properties.put(GridCoverage2DReader.FILE_SOURCE_PROPERTY, granulesPaths);
         }

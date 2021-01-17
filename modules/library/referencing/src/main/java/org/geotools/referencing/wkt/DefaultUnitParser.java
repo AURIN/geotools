@@ -18,9 +18,7 @@ package org.geotools.referencing.wkt;
 
 import java.util.HashMap;
 import java.util.Objects;
-import javax.measure.IncommensurableException;
 import javax.measure.Quantity;
-import javax.measure.UnconvertibleException;
 import javax.measure.Unit;
 import org.geotools.measure.Units;
 import org.geotools.referencing.wkt.GeoToolsCRSUnitFormat.BaseGT2Format;
@@ -34,8 +32,7 @@ import tech.units.indriya.unit.TransformedUnit;
 public class DefaultUnitParser extends BaseGT2Format {
 
     private static final DefaultUnitParser UNITPARSER = new DefaultUnitParser();
-    protected HashMap<UnitWrapper, Unit<?>> unitWrapperToUnitMap =
-            new HashMap<UnitWrapper, Unit<?>>();
+    protected HashMap<UnitWrapper, Unit<?>> unitWrapperToUnitMap = new HashMap<>();
 
     //    /**
     //     * Gets a UnitFormat configured to parse units. Since usually we don't know the citation
@@ -70,6 +67,7 @@ public class DefaultUnitParser extends BaseGT2Format {
      * the reference units defined in the JSR 385 implementation in use. If no equivalent reference
      * unit is defined, it returns the provided unit
      */
+    @SuppressWarnings("unchecked")
     public <Q extends Quantity<Q>> Unit<Q> getEquivalentUnit(Unit<Q> unit) {
         return (Unit<Q>) unitWrapperToUnitMap.getOrDefault(new UnitWrapper(unit), unit);
     }
@@ -107,7 +105,6 @@ public class DefaultUnitParser extends BaseGT2Format {
                 try {
                     float factor1 = (float) unit.getConverterToAny(systemUnit).convert(1.0);
                     return Objects.hash(systemUnit, Float.floatToIntBits(factor1));
-                } catch (UnconvertibleException | IncommensurableException e) {
                 } catch (Throwable e) {
                 }
             }

@@ -89,7 +89,6 @@ import org.geotools.util.Range;
 import org.geotools.util.logging.Logging;
 import org.geotools.xml.styling.SLDTransformer;
 import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
@@ -430,8 +429,7 @@ public class CssTranslator {
                         FeatureTypeStyle.VALUE_EVALUATION_MODE_FIRST);
 
                 if (featureTypeName != null) {
-                    ftsBuilder.setFeatureTypeNames(
-                            Arrays.asList((Name) new NameImpl(featureTypeName)));
+                    ftsBuilder.setFeatureTypeNames(Arrays.asList(new NameImpl(featureTypeName)));
                 }
                 Collections.sort(combinedRules, CssRuleComparator.DESCENDING);
                 int rulesCount = combinedRules.size();
@@ -648,8 +646,7 @@ public class CssTranslator {
 
                 FeatureTypeStyleBuilder ftsBuilder = styleBuilder.featureTypeStyle();
                 if (featureTypeName != null) {
-                    ftsBuilder.setFeatureTypeNames(
-                            Arrays.asList((Name) new NameImpl(featureTypeName)));
+                    ftsBuilder.setFeatureTypeNames(Arrays.asList(new NameImpl(featureTypeName)));
                 }
 
                 String composite = null;
@@ -840,7 +837,7 @@ public class CssTranslator {
                 if (others.size() == 1) {
                     final CssRule r = deriveWithSelector(rule, others.get(0));
                     result.add(r);
-                } else if (others.size() > 0) {
+                } else if (!others.isEmpty()) {
                     final CssRule r = deriveWithSelector(rule, new Or(others));
                     result.add(r);
                 }
@@ -1247,6 +1244,7 @@ public class CssTranslator {
                                 "font-family",
                                 "font-style",
                                 "font-weight",
+                                "font-size",
                                 "font-family");
                 for (int j = 0; j < maxSize; j++) {
                     FontBuilder fb = tb.newFont();

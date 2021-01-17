@@ -53,7 +53,6 @@ import org.geotools.util.factory.Hints;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import si.uom.SI;
-import si.uom.SI.*;
 
 /**
  * Base class for grid coverage tests. This base class provides factory methods for sample {@link
@@ -412,11 +411,8 @@ public class GridCoverageTestBase extends CoverageTestBase {
          * But we want to test the default GridCoverage2D encoding.
          */
         final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(buffer);
-        try {
+        try (ObjectOutputStream out = new ObjectOutputStream(buffer)) {
             out.writeObject(coverage);
-        } finally {
-            out.close();
         }
         final ObjectInputStream in =
                 new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));

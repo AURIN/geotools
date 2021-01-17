@@ -93,15 +93,13 @@ public class FeatureTypeTest extends DataTestCase {
         try {
             SimpleFeatureBuilder.build(abstractType, new Object[0], null);
             fail("abstract type allowed create");
-        } catch (IllegalArgumentException iae) {
-        } catch (UnsupportedOperationException uoe) {
+        } catch (IllegalArgumentException | UnsupportedOperationException iae) {
         }
 
         try {
             SimpleFeatureBuilder.build(abstractType2, new Object[0], null);
             fail("abstract type allowed create");
-        } catch (IllegalArgumentException iae) {
-        } catch (UnsupportedOperationException uoe) {
+        } catch (IllegalArgumentException | UnsupportedOperationException iae) {
         }
     }
 
@@ -121,13 +119,13 @@ public class FeatureTypeTest extends DataTestCase {
         assertEquals(ft, ft2);
 
         tb.setName("Thingee");
-        assertTrue(!ft.equals(tb.buildFeatureType()));
+        assertFalse(ft.equals(tb.buildFeatureType()));
 
         tb.init(ft);
         tb.setNamespaceURI("http://www.somewhereelse.net");
 
-        assertTrue(!ft.equals(tb.buildFeatureType()));
-        assertTrue(!ft.equals(null));
+        assertFalse(ft.equals(tb.buildFeatureType()));
+        assertFalse(ft.equals(null));
     }
 
     public void testCopyFeature() throws Exception {
@@ -227,12 +225,12 @@ public class FeatureTypeTest extends DataTestCase {
                 new int[] {
                     1, 2, 3, 4,
                 };
-        List list = new ArrayList();
+        List<Object> list = new ArrayList<>();
         list.add(str);
         list.add(i);
         list.add(f);
         list.add(d);
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("a", str);
         map.put("b", i);
         map.put("c", f);
@@ -256,10 +254,10 @@ public class FeatureTypeTest extends DataTestCase {
         assertDuplicate("point", point, DataUtilities.duplicate(point));
     }
 
-    static Set immutable;
+    static Set<Class<?>> immutable;
 
     static {
-        immutable = new HashSet();
+        immutable = new HashSet<>();
         immutable.add(String.class);
         immutable.add(Integer.class);
         immutable.add(Double.class);

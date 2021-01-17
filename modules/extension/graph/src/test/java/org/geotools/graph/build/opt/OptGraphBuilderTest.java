@@ -44,7 +44,7 @@ public class OptGraphBuilderTest extends TestCase {
 
         Node n = m_builder.buildNode();
 
-        assertTrue(n != null);
+        assertNotNull(n);
         assertTrue(n instanceof OptNode);
     }
 
@@ -56,7 +56,7 @@ public class OptGraphBuilderTest extends TestCase {
 
         Edge e = m_builder.buildEdge(n1, n2);
 
-        assertTrue(e != null);
+        assertNotNull(e);
         assertTrue(e instanceof OptEdge);
         assertTrue(e.getNodeA() == n1 || e.getNodeA() == n2);
         assertTrue(e.getNodeB() == n1 || e.getNodeB() == n2);
@@ -66,7 +66,7 @@ public class OptGraphBuilderTest extends TestCase {
         Node n1 = m_builder.buildNode();
         m_builder.addNode(n1);
 
-        assertTrue(m_builder.getNodes().size() == 1);
+        assertEquals(1, m_builder.getNodes().size());
         assertTrue(m_builder.getNodes().contains(n1));
     }
 
@@ -84,7 +84,7 @@ public class OptGraphBuilderTest extends TestCase {
 
         m_builder.addEdge(e);
 
-        assertTrue(m_builder.getEdges().size() == 1);
+        assertEquals(1, m_builder.getEdges().size());
         assertTrue(m_builder.getEdges().contains(e));
 
         assertTrue(n1.getEdges().contains(e));
@@ -113,11 +113,11 @@ public class OptGraphBuilderTest extends TestCase {
         m_builder.addNode(n1);
         m_builder.addNode(n2);
 
-        assertTrue(m_builder.getNodes().size() == 2);
+        assertEquals(2, m_builder.getNodes().size());
         assertTrue(m_builder.getNodes().contains(n1));
         assertTrue(m_builder.getNodes().contains(n2));
 
-        List toRemove = new ArrayList();
+        List<Node> toRemove = new ArrayList<>();
         toRemove.add(n1);
         toRemove.add(n2);
 
@@ -143,7 +143,7 @@ public class OptGraphBuilderTest extends TestCase {
 
         try {
             m_builder.removeEdge(e);
-            assertTrue(false);
+            fail();
         } catch (UnsupportedOperationException uoe) {
             assertTrue(true);
         }
@@ -170,7 +170,7 @@ public class OptGraphBuilderTest extends TestCase {
         m_builder.addEdge(e1);
         m_builder.addEdge(e2);
 
-        List toRemove = new ArrayList();
+        List<Edge> toRemove = new ArrayList<>();
         toRemove.add(e1);
         toRemove.add(e2);
 
@@ -179,7 +179,7 @@ public class OptGraphBuilderTest extends TestCase {
 
         try {
             m_builder.removeEdges(toRemove);
-            assertTrue(false);
+            fail();
         } catch (UnsupportedOperationException uoe) {
             assertTrue(true);
         }
@@ -187,7 +187,7 @@ public class OptGraphBuilderTest extends TestCase {
 
     public void test_getGraph() {
         Graph graph = m_builder.getGraph();
-        assertTrue(graph != null);
+        assertNotNull(graph);
     }
 
     private OptGraphBuilder createBuilder() {

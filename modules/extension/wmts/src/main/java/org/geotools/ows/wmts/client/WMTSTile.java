@@ -56,7 +56,7 @@ class WMTSTile extends Tile {
      *
      * <p>You can set the cache size using the property WMTS_TILE_CACHE_SIZE_PROPERTY_NAME.
      */
-    private static final ObjectCache tileImages;
+    private static final ObjectCache<String, BufferedImage> tileImages;
 
     static {
         int cacheSize = 150;
@@ -210,7 +210,7 @@ class WMTSTile extends Tile {
         if (!(tileImages.peek(tileKey) == null || tileImages.get(tileKey) == null)) {
             if (LOGGER.isLoggable(Level.FINE))
                 LOGGER.log(Level.FINE, "Tile image already loaded for tile " + getId());
-            return (BufferedImage) tileImages.get(tileKey);
+            return tileImages.get(tileKey);
         } else {
             if (LOGGER.isLoggable(Level.FINE))
                 LOGGER.log(Level.FINE, "Tile image not yet loaded for tile " + getId());
@@ -221,7 +221,7 @@ class WMTSTile extends Tile {
     }
 
     public BufferedImage doLoadImageTileImage(Tile tile) throws IOException {
-
+        @SuppressWarnings("unchecked")
         Map<String, String> headers =
                 (Map<String, String>)
                         this.service.getExtrainfo().get(WMTSTileService.EXTRA_HEADERS);

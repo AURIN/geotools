@@ -16,7 +16,10 @@
  */
 package org.geotools.ows.wmts;
 
-import static junit.framework.TestCase.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.geotools.ows.wmts.WMTSTestUtils.createCapabilities;
 import static org.junit.Assert.assertFalse;
 
@@ -41,7 +44,7 @@ public class WebMapTileServerTest {
         WMTSCapabilities caps = createCapabilities("nasa.getcapa.xml");
         WebMapTileServer wmts = new WebMapTileServer(caps);
 
-        Layer layer = (Layer) caps.getLayer("AMSRE_Surface_Rain_Rate_Night");
+        Layer layer = caps.getLayer("AMSRE_Surface_Rain_Rate_Night");
         // urn:ogc:def:crs:OGC:1.3:CRS84
 
         // <ows:WGS84BoundingBox crs="urn:ogc:def:crs:OGC:2:84">
@@ -69,7 +72,7 @@ public class WebMapTileServerTest {
         WMTSCapabilities caps = createCapabilities("admin_ch.getcapa.xml");
         WebMapTileServer wmts = new WebMapTileServer(caps);
 
-        Layer layer = (Layer) caps.getLayer("ch.are.alpenkonvention");
+        Layer layer = caps.getLayer("ch.are.alpenkonvention");
         // <ows:SupportedCRS>urn:ogc:def:crs:EPSG:2056</ows:SupportedCRS>
         // <ows:WGS84BoundingBox>
         // <ows:LowerCorner>5.140242 45.398181</ows:LowerCorner>

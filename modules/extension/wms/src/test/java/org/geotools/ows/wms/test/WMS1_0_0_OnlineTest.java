@@ -27,7 +27,12 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.Specification;
-import org.geotools.ows.wms.*;
+import org.geotools.ows.wms.CRSEnvelope;
+import org.geotools.ows.wms.Layer;
+import org.geotools.ows.wms.WMS1_0_0;
+import org.geotools.ows.wms.WMSCapabilities;
+import org.geotools.ows.wms.WMSSpecification;
+import org.geotools.ows.wms.WebMapServer;
 import org.geotools.ows.wms.request.GetMapRequest;
 import org.geotools.ows.wms.xml.WMSSchema;
 import org.geotools.test.TestData;
@@ -83,8 +88,7 @@ public class WMS1_0_0_OnlineTest extends ServerTestCase {
     public void testCreateDescribeLayerRequest() throws Exception {
         try {
             spec.createDescribeLayerRequest(null);
-            assertTrue(
-                    "Shouldn't be able to create DescribeLayer requests for version 1.0.0", false);
+            fail("Shouldn't be able to create DescribeLayer requests for version 1.0.0");
         } catch (UnsupportedOperationException e) {
 
         }
@@ -121,12 +125,11 @@ public class WMS1_0_0_OnlineTest extends ServerTestCase {
             assertEquals(capabilities.getLayerList().size(), 21);
 
             Layer[] layers =
-                    (Layer[])
-                            capabilities
-                                    .getLayerList()
-                                    .toArray(new Layer[capabilities.getLayerList().size()]);
+                    capabilities
+                            .getLayerList()
+                            .toArray(new Layer[capabilities.getLayerList().size()]);
             assertEquals(layers[0].getTitle(), "World Map");
-            assertEquals(layers[0].getParent(), null);
+            assertNull(layers[0].getParent());
             assertTrue(layers[0].getSrs().contains("EPSG:4326")); //  case should not matter
             assertTrue(layers[0].getSrs().contains("EPSG:4327"));
             assertEquals(layers[1].getTitle(), "Bathymetry");
@@ -135,7 +138,7 @@ public class WMS1_0_0_OnlineTest extends ServerTestCase {
             assertEquals(layers[20].getName(), "Ocean features");
             assertEquals(layers[0].getBoundingBoxes().size(), 1);
 
-            CRSEnvelope bbox = (CRSEnvelope) layers[1].getBoundingBoxes().get("EPSG:4326");
+            CRSEnvelope bbox = layers[1].getBoundingBoxes().get("EPSG:4326");
             assertNotNull(bbox);
         } catch (Exception e) {
             if (e.getMessage().indexOf("timed out") > 0) {

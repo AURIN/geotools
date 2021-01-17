@@ -17,14 +17,26 @@
 package org.geotools.ows.wmts.map;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import net.opengis.wmts.v_1.CapabilitiesType;
 import org.apache.commons.lang3.NotImplementedException;
@@ -56,9 +68,7 @@ public class WMTSCoverageReaderTest {
     public void testRESTInitMapRequest() throws Exception {
         WebMapTileServer server = createServer(REST_CAPA_RESOURCENAME);
         WMTSLayer layer =
-                (WMTSLayer)
-                        server.getCapabilities()
-                                .getLayer("ch.are.agglomerationen_isolierte_staedte");
+                server.getCapabilities().getLayer("ch.are.agglomerationen_isolierte_staedte");
         WMTSCoverageReader wcr = new WMTSCoverageReader(server, layer);
         ReferencedEnvelope bbox = new ReferencedEnvelope(5, 12, 45, 49, CRS.decode("EPSG:4326"));
         testInitMapRequest(wcr, bbox);

@@ -42,7 +42,20 @@ import org.geotools.util.factory.GeoTools;
 import org.geotools.util.logging.Logging;
 import org.locationtech.jts.algorithm.LineIntersector;
 import org.locationtech.jts.algorithm.RobustLineIntersector;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateArrays;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFilter;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryComponentFilter;
+import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import org.locationtech.jts.geom.util.GeometryEditor;
 import org.opengis.feature.simple.SimpleFeature;
@@ -310,8 +323,7 @@ public class ClipProcess implements VectorProcess {
 
         protected boolean hasElevations(CoordinateSequence seq) {
             return (seq instanceof CoordinateArraySequence
-                            && !Double.isNaN(
-                                    ((CoordinateArraySequence) seq).getCoordinate(0).getZ()))
+                            && !Double.isNaN(seq.getCoordinate(0).getZ()))
                     || (!(seq instanceof CoordinateArraySequence) && seq.getDimension() > 2);
         }
 
@@ -335,7 +347,7 @@ public class ClipProcess implements VectorProcess {
             }
 
             List<PointDistance> gatherElevationPointCloud(Geometry geom) {
-                final List<PointDistance> results = new ArrayList<PointDistance>();
+                final List<PointDistance> results = new ArrayList<>();
                 geom.apply(
                         new CoordinateSequenceFilter() {
 
@@ -372,7 +384,7 @@ public class ClipProcess implements VectorProcess {
                             }
                         });
 
-                if (results.size() == 0) {
+                if (results.isEmpty()) {
                     return null;
                 } else {
                     return results;
@@ -482,7 +494,7 @@ public class ClipProcess implements VectorProcess {
             private final ArrayList<LineString> originalLines;
 
             public LinearElevationInterpolator(Geometry original, CoordinateReferenceSystem crs) {
-                originalLines = new ArrayList<LineString>();
+                originalLines = new ArrayList<>();
                 original.apply(
                         new GeometryComponentFilter() {
 

@@ -27,7 +27,9 @@ import it.geosolutions.jaiext.range.NoDataContainer;
 import it.geosolutions.jaiext.vectorbin.ROIGeometry;
 import it.geosolutions.jaiext.vectorbin.VectorBinarizeDescriptor;
 import it.geosolutions.jaiext.vectorbin.VectorBinarizeRIF;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
@@ -345,7 +347,7 @@ public class GranuleDescriptor {
     int maxDecimationFactor = -1;
 
     final Map<Integer, GranuleOverviewLevelDescriptor> granuleLevels =
-            Collections.synchronizedMap(new HashMap<Integer, GranuleOverviewLevelDescriptor>());
+            Collections.synchronizedMap(new HashMap<>());
 
     AffineTransform baseGridToWorld;
 
@@ -508,11 +510,9 @@ public class GranuleDescriptor {
 
             // handle the nodata and rescaling if available
             initFromImageMetadata(imageReader);
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IOException e) {
             throw new IllegalArgumentException(e);
 
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
         } finally {
             // close/dispose stream and readers
             try {
@@ -1512,19 +1512,6 @@ public class GranuleDescriptor {
                         renderedImage, null, granuleURLUpdated, doFiltering, pamDataset, this);
             }
 
-        } catch (IllegalStateException e) {
-            if (LOGGER.isLoggable(java.util.logging.Level.WARNING)) {
-                LOGGER.log(
-                        java.util.logging.Level.WARNING,
-                        new StringBuilder("Unable to load raster for granuleDescriptor ")
-                                .append(this.toString())
-                                .append(" with request ")
-                                .append(request.toString())
-                                .append(" Resulting in no granule loaded: Empty result")
-                                .toString(),
-                        e);
-            }
-            return null;
         } catch (org.opengis.referencing.operation.NoninvertibleTransformException e) {
             if (LOGGER.isLoggable(java.util.logging.Level.WARNING)) {
                 LOGGER.log(
@@ -1538,10 +1525,10 @@ public class GranuleDescriptor {
                         e);
             }
             return null;
-        } catch (TransformException e) {
-            if (LOGGER.isLoggable(java.util.logging.Level.WARNING)) {
+        } catch (IllegalStateException | TransformException e) {
+            if (LOGGER.isLoggable(Level.WARNING)) {
                 LOGGER.log(
-                        java.util.logging.Level.WARNING,
+                        Level.WARNING,
                         new StringBuilder("Unable to load raster for granuleDescriptor ")
                                 .append(this.toString())
                                 .append(" with request ")
@@ -1551,7 +1538,6 @@ public class GranuleDescriptor {
                         e);
             }
             return null;
-
         } finally {
             try {
                 if (cleanupInFinally && inStream != null) {
@@ -1685,10 +1671,7 @@ public class GranuleDescriptor {
 
                     return newLevel;
 
-                } catch (IllegalStateException e) {
-                    throw new IllegalArgumentException(e);
-
-                } catch (IOException e) {
+                } catch (IllegalStateException | IOException e) {
                     throw new IllegalArgumentException(e);
                 }
             }
@@ -1727,14 +1710,8 @@ public class GranuleDescriptor {
             // call internal method which will close everything
             return getLevel(index, reader, index, false);
 
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IOException e) {
 
-            // clean up
-            if (reader != null) reader.dispose();
-
-            throw new IllegalArgumentException(e);
-
-        } catch (IOException e) {
             // clean up
             if (reader != null) reader.dispose();
 

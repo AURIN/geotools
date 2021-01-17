@@ -17,6 +17,8 @@
 
 package org.geotools.feature.simple;
 
+import static org.junit.Assert.assertNotEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
@@ -47,16 +49,17 @@ public class SimpleFeatureTypeImplTest extends TestCase {
         assertEquals(
                 "FeatureType and SimpleFeatureType APIs must return the same descriptors in the same order",
                 new ArrayList<PropertyDescriptor>(type.getAttributeDescriptors()),
-                new ArrayList<PropertyDescriptor>(type.getDescriptors()));
+                new ArrayList<>(type.getDescriptors()));
     }
 
     /** Test that property order is significant to equals(). */
     public void testOrderSignificantEquals() {
         SimpleFeatureType type1 = buildLocationCountType();
         SimpleFeatureType type2 = buildCountLocationType();
-        assertFalse(
-                "Simple feature types with properties in a different order must not be equal",
-                type1.equals(type2));
+        assertNotEquals(
+                "Simple feature types with properties in a different order must not be " + "equal",
+                type1,
+                type2);
     }
 
     /** Test that distinct instances identically constructed are equal (location/count version). */
@@ -150,7 +153,7 @@ public class SimpleFeatureTypeImplTest extends TestCase {
                         null,
                         false,
                         false,
-                        Collections.EMPTY_LIST,
+                        Collections.emptyList(),
                         null,
                         null));
         builder.addBinding(
@@ -160,7 +163,7 @@ public class SimpleFeatureTypeImplTest extends TestCase {
                         null,
                         false,
                         false,
-                        Collections.EMPTY_LIST,
+                        Collections.emptyList(),
                         null,
                         null));
         builder.addBinding(
@@ -169,7 +172,7 @@ public class SimpleFeatureTypeImplTest extends TestCase {
                         Integer.class,
                         false,
                         false,
-                        Collections.EMPTY_LIST,
+                        Collections.emptyList(),
                         null,
                         null));
         builder.setName("ThingsType");

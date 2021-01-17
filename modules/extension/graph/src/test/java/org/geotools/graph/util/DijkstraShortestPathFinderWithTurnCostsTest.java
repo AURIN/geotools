@@ -18,13 +18,13 @@ package org.geotools.graph.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import junit.framework.TestCase;
 import org.geotools.graph.build.line.BasicLineGraphGenerator;
 import org.geotools.graph.path.DijkstraShortestPathFinder;
 import org.geotools.graph.path.Path;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
-import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.traverse.standard.DijkstraIterator;
 import org.locationtech.jts.geom.Coordinate;
@@ -57,8 +57,8 @@ public class DijkstraShortestPathFinderWithTurnCostsTest extends TestCase {
         BasicLineGraphGenerator graphGen = new BasicLineGraphGenerator();
 
         // add the lines to the graph
-        for (int i = 0; i < lines.length; i++) {
-            graphGen.add(lines[i]);
+        for (LineSegment line : lines) {
+            graphGen.add(line);
         }
 
         this.graph = graphGen.getGraph();
@@ -70,7 +70,7 @@ public class DijkstraShortestPathFinderWithTurnCostsTest extends TestCase {
 
         double[] expected = {0.0, 1.0, 3.0, 3.0};
 
-        ArrayList gotArray = new ArrayList(4);
+        List<Double> gotArray = new ArrayList<>(4);
 
         Iterator it = graph.getNodes().iterator();
 
@@ -78,8 +78,7 @@ public class DijkstraShortestPathFinderWithTurnCostsTest extends TestCase {
 
         // create the path finder
         DijkstraShortestPathFinder pf =
-                new DijkstraShortestPathFinder(
-                        graph, (Graphable) source, costFunction(), tcostFunction());
+                new DijkstraShortestPathFinder(graph, source, costFunction(), tcostFunction());
 
         pf.calculate();
 
@@ -88,7 +87,7 @@ public class DijkstraShortestPathFinderWithTurnCostsTest extends TestCase {
         while (it1.hasNext()) {
             Node d = (Node) it1.next();
 
-            Path path = pf.getPath((Graphable) d);
+            Path path = pf.getPath(d);
 
             gotArray.add(pf.getCost(d));
         }

@@ -44,7 +44,11 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.media.jai.ImageLayout;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.geotools.coverage.grid.io.*;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GranuleSource;
+import org.geotools.coverage.grid.io.GranuleStore;
+import org.geotools.coverage.grid.io.GridCoverage2DReader;
+import org.geotools.coverage.grid.io.StructuredGridCoverage2DReader;
 import org.geotools.coverage.grid.io.footprint.MultiLevelROIProvider;
 import org.geotools.coverage.util.CoverageUtilities;
 import org.geotools.data.DataSourceException;
@@ -759,7 +763,7 @@ public class ImageMosaicConfigHandler {
             final GridCoverage2DReader inputReader,
             final List<PropertiesCollector> propertiesCollectors) {
         // collect and dump properties
-        if (propertiesCollectors != null && propertiesCollectors.size() > 0)
+        if (propertiesCollectors != null && !propertiesCollectors.isEmpty())
             for (PropertiesCollector pc : propertiesCollectors) {
                 elementBeingProcessed.addToCollector(pc);
                 pc.collect(inputReader).setProperties(feature);
@@ -1674,7 +1678,7 @@ public class ImageMosaicConfigHandler {
      */
     public String getTargetCoverageName(
             GridCoverage2DReader inputCoverageReader, String inputCoverageName) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(Prop.INDEX_NAME, getRunConfiguration().getParameter(Prop.INDEX_NAME));
         map.put(Prop.INPUT_COVERAGE_NAME, inputCoverageName);
         return coverageNameHandler.getTargetCoverageName(inputCoverageReader, map);

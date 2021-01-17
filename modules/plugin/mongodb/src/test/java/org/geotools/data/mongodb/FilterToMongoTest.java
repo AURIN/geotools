@@ -17,10 +17,10 @@
  */
 package org.geotools.data.mongodb;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -365,7 +365,7 @@ public class FilterToMongoTest extends TestCase {
         assertEquals(1, obj.keySet().size());
         BasicDBObject operator = (BasicDBObject) obj.get("properties.foo");
 
-        assertEquals(null, operator.get("$eq"));
+        assertNull(operator.get("$eq"));
     }
 
     private Literal getGeometryParameter() {

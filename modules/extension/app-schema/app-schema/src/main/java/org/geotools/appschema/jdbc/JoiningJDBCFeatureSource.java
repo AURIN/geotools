@@ -47,8 +47,17 @@ import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.geotools.filter.visitor.SimplifyingFilterVisitor;
-import org.geotools.jdbc.*;
+import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.JDBCFeatureReader;
+import org.geotools.jdbc.JDBCFeatureSource;
+import org.geotools.jdbc.JDBCFeatureStore;
 import org.geotools.jdbc.JoinInfo.JoinQualifier;
+import org.geotools.jdbc.PreparedFilterToSQL;
+import org.geotools.jdbc.PreparedStatementSQLDialect;
+import org.geotools.jdbc.PrimaryKey;
+import org.geotools.jdbc.PrimaryKeyColumn;
+import org.geotools.jdbc.PrimaryKeyFIDValidator;
+import org.geotools.jdbc.SQLDialect;
 import org.geotools.util.factory.Hints;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
@@ -146,17 +155,17 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
             Set<String> orderByFields,
             StringBuffer sql)
             throws IOException, SQLException {
-        for (int i = 0; i < sort.length; i++) {
-            if (SortBy.NATURAL_ORDER.equals(sort[i]) || SortBy.REVERSE_ORDER.equals(sort[i])) {
+        for (SortBy sortBy : sort) {
+            if (SortBy.NATURAL_ORDER.equals(sortBy) || SortBy.REVERSE_ORDER.equals(sortBy)) {
                 throw new IOException("Cannot do natural order in joining queries");
             } else {
                 StringBuffer mySql = new StringBuffer();
                 if (alias != null) {
                     encodeColumnName2(
-                            sort[i].getPropertyName().getPropertyName(), alias, mySql, null);
+                            sortBy.getPropertyName().getPropertyName(), alias, mySql, null);
                 } else {
                     encodeColumnName(
-                            sort[i].getPropertyName().getPropertyName(), typeName, mySql, null);
+                            sortBy.getPropertyName().getPropertyName(), typeName, mySql, null);
                 }
                 if (!mySql.toString().isEmpty() && orderByFields.add(mySql.toString())) {
                     // if it's not already in ORDER BY (because you can't have duplicate column
@@ -167,7 +176,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
                     }
                     sql.append(mySql);
 
-                    if (sort[i].getSortOrder() == SortOrder.DESCENDING) {
+                    if (sortBy.getSortOrder() == SortOrder.DESCENDING) {
                         sql.append(" DESC");
                     } else {
                         sql.append(" ASC");
@@ -242,7 +251,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
     protected void sort(
             JoiningQuery query, StringBuffer sql, String[] aliases, Set<String> pkColumnNames)
             throws IOException, SQLException, FilterToSQLException {
-        Set<String> orderByFields = new LinkedHashSet<String>();
+        Set<String> orderByFields = new LinkedHashSet<>();
         StringBuffer joinOrders = new StringBuffer();
         for (int j = query.getQueryJoins() == null ? -1 : query.getQueryJoins().size() - 1;
                 j >= -1;
@@ -330,8 +339,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
     protected FilterToSQL createFilterToSQL(
             SimpleFeatureType ft, boolean usePreparedStatementParameters) {
         if (getDataStore().getSQLDialect() instanceof PreparedStatementSQLDialect) {
-            PreparedFilterToSQL pfsql =
-                    (PreparedFilterToSQL) getDataStore().createPreparedFilterToSQL(ft);
+            PreparedFilterToSQL pfsql = getDataStore().createPreparedFilterToSQL(ft);
             pfsql.setPrepareEnabled(usePreparedStatementParameters);
             return pfsql;
         } else {
@@ -372,7 +380,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
         StringBuffer joinClause = new StringBuffer();
 
         // joining
-        Set<String> tableNames = new HashSet<String>();
+        Set<String> tableNames = new HashSet<>();
 
         String lastTypeName = featureType.getTypeName();
         String curTypeName = lastTypeName;
@@ -449,7 +457,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Set<String> pkColumnNames = new HashSet<String>();
+        Set<String> pkColumnNames = new HashSet<>();
         String colName;
         for (PrimaryKeyColumn col : key.getColumns()) {
             colName = col.getName();
@@ -592,7 +600,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
                                 getDataStore().getSchema(lastTableName), toSQLref != null);
 
                 // apply paging to the root feature if applicable
-                Collection<String> ids = new ArrayList<String>();
+                Collection<String> ids = new ArrayList<>();
 
                 if (isRootFeature && query.isDenormalised()) {
                     // apply inner join for paging to root feature
@@ -981,7 +989,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
 
                     // apply SORTBY
                     SortBy[] sort = query.getSortBy();
-                    Set<String> orderByFields = new LinkedHashSet<String>();
+                    Set<String> orderByFields = new LinkedHashSet<>();
                     StringBuffer sortSQL = new StringBuffer();
                     if (sort != null) {
                         sort(typeName, null, sort, orderByFields, sortSQL);
@@ -1051,7 +1059,7 @@ public class JoiningJDBCFeatureSource extends JDBCFeatureSource {
             SimpleFeatureType featureType, JoiningQuery query, Connection cx)
             throws SQLException, IOException, FilterToSQLException {
 
-        AtomicReference<PreparedFilterToSQL> toSQLref = new AtomicReference<PreparedFilterToSQL>();
+        AtomicReference<PreparedFilterToSQL> toSQLref = new AtomicReference<>();
         String sql = selectSQL(featureType, query, toSQLref);
 
         LOGGER.fine(sql);

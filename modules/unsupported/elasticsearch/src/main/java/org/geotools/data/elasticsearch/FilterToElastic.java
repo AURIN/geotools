@@ -169,7 +169,7 @@ class FilterToElastic implements FilterVisitor, ExpressionVisitor {
 
     public FilterToElastic() {
         queryBuilder = ElasticConstants.MATCH_ALL;
-        nativeQueryBuilder = ImmutableMap.of("match_all", Collections.EMPTY_MAP);
+        nativeQueryBuilder = ImmutableMap.of("match_all", Collections.emptyMap());
         helper = new FilterToElasticHelper(this);
     }
 
@@ -1195,6 +1195,7 @@ class FilterToElastic implements FilterVisitor, ExpressionVisitor {
 
     private void updateDateFormatter(AttributeDescriptor attType) {
         if (attType != null) {
+            @SuppressWarnings("unchecked")
             final List<String> validFormats =
                     (List<String>) attType.getUserData().get(ElasticConstants.DATE_FORMAT);
             if (validFormats != null) {

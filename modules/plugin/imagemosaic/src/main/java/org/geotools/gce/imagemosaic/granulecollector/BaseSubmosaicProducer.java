@@ -19,7 +19,8 @@ package org.geotools.gce.imagemosaic.granulecollector;
 
 import it.geosolutions.jaiext.JAIExt;
 import it.geosolutions.jaiext.vectorbin.ROIGeometry;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.MultiPixelPackedSampleModel;
@@ -65,7 +66,7 @@ public class BaseSubmosaicProducer implements SubmosaicProducer {
 
     /** The final lists for granules to be computed, splitted per dimension value. */
     protected final List<Future<GranuleDescriptor.GranuleLoadingResult>> granulesFutures =
-            new ArrayList<Future<GranuleDescriptor.GranuleLoadingResult>>();
+            new ArrayList<>();
 
     protected final boolean dryRun;
 

@@ -17,7 +17,11 @@
 package org.geotools.styling.css;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import it.geosolutions.jaiext.classifier.LinearColorMap;
 import it.geosolutions.jaiext.classifier.LinearColorMapElement;
@@ -256,7 +260,7 @@ public class ParserSyntheticTest extends CssBaseTest {
                 0,
                 "mark",
                 new Value.Function(
-                        "symbol", Collections.singletonList((Value) new Value.Literal("circle"))));
+                        "symbol", Collections.singletonList(new Value.Literal("circle"))));
     }
 
     @Test
@@ -825,7 +829,7 @@ public class ParserSyntheticTest extends CssBaseTest {
 
     private <T extends Selector> T assertSelector(Selector selector, Class<T> clazz) {
         assertThat(selector, instanceOf(clazz));
-        return (T) selector;
+        return clazz.cast(selector);
     }
 
     @Test

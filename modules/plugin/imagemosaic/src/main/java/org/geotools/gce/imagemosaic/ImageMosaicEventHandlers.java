@@ -38,8 +38,7 @@ public class ImageMosaicEventHandlers {
             org.geotools.util.logging.Logging.getLogger(ImageMosaicEventHandlers.class);
 
     /** List containing all the objects that want to be notified during processing. */
-    protected List<ProcessingEventListener> notificationListeners =
-            new CopyOnWriteArrayList<ProcessingEventListener>();
+    protected List<ProcessingEventListener> notificationListeners = new CopyOnWriteArrayList<>();
 
     /**
      * Set this to false for command line UIs where the delayed event sending may prevent some
@@ -190,14 +189,12 @@ public class ImageMosaicEventHandlers {
 
         /** Run the event launcher */
         public void run() {
-            final int numListeners = listeners.length;
             if (event instanceof ExceptionEvent)
-                for (int i = 0; i < numListeners; i++)
-                    ((ProcessingEventListener) listeners[i])
-                            .exceptionOccurred((ExceptionEvent) this.event);
+                for (Object o : listeners)
+                    ((ProcessingEventListener) o).exceptionOccurred((ExceptionEvent) this.event);
             else
-                for (int i = 0; i < numListeners; i++)
-                    ((ProcessingEventListener) listeners[i]).getNotification(this.event);
+                for (Object listener : listeners)
+                    ((ProcessingEventListener) listener).getNotification(this.event);
         }
     }
 

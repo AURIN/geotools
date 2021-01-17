@@ -338,8 +338,7 @@ class FilterToSqlHelper {
                 out.write(" AND ");
             }
 
-            visitBinarySpatialOperator(
-                    filter, (Expression) property, (Expression) geometry, swapped, extraData);
+            visitBinarySpatialOperator(filter, property, (Expression) geometry, swapped, extraData);
         }
     }
 
@@ -412,7 +411,7 @@ class FilterToSqlHelper {
                 if (Math.sqrt(env.getWidth() * env.getWidth() + env.getHeight() * env.getHeight())
                         >= 180) {
                     // slice in 90x90 degrees quadrants, none of them has a diagonal longer than 180
-                    final List<Polygon> polygons = new ArrayList<Polygon>();
+                    final List<Polygon> polygons = new ArrayList<>();
                     for (double lon = Math.floor(env.getMinX()); lon < env.getMaxX(); lon += 90) {
                         for (double lat = Math.floor(env.getMinY());
                                 lat < env.getMaxY();
@@ -451,7 +450,7 @@ class FilterToSqlHelper {
         }
 
         // filter out only polygonal parts
-        final List<Polygon> polygons = new ArrayList<Polygon>();
+        final List<Polygon> polygons = new ArrayList<>();
         geometry.apply(
                 new GeometryComponentFilter() {
 
@@ -467,13 +466,12 @@ class FilterToSqlHelper {
     }
 
     private Geometry toPolygon(GeometryFactory gf, final List<Polygon> polygons) {
-        if (polygons.size() == 0) {
+        if (polygons.isEmpty()) {
             return gf.createGeometryCollection(null);
         } else if (polygons.size() == 1) {
             return polygons.get(0);
         } else {
-            return gf.createMultiPolygon(
-                    (Polygon[]) polygons.toArray(new Polygon[polygons.size()]));
+            return gf.createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
         }
     }
 
@@ -1019,7 +1017,7 @@ class FilterToSqlHelper {
         Expression numNearest = getParameter(filter, 1, true);
         try {
             List<PrimaryKeyColumn> pkColumns = delegate.getPrimaryKey().getColumns();
-            if (pkColumns == null || pkColumns.size() == 0) {
+            if (pkColumns == null || pkColumns.isEmpty()) {
                 throw new UnsupportedOperationException(
                         "Unsupported usage of Postgis Nearest Operator: table with no primary key");
             }

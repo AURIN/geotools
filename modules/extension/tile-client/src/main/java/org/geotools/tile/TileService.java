@@ -17,7 +17,11 @@
  */
 package org.geotools.tile;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotools.data.ows.HTTPClient;
@@ -53,7 +57,7 @@ public abstract class TileService {
      *
      * <p>Because we are using SoftReference, we won't run out of Memory, the GC will free space.
      */
-    private ObjectCache tiles = ObjectCaches.create("soft", 50); // $NON-NLS-1$
+    private final ObjectCache<String, Tile> tiles = ObjectCaches.create("soft", 50); // $NON-NLS-1$
 
     private String baseURL;
 
@@ -338,7 +342,7 @@ public abstract class TileService {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.fine("Tile already in cache: " + id);
             }
-            return (Tile) tiles.get(id);
+            return tiles.get(id);
         } else {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.fine("Tile added to cache: " + id);
@@ -373,9 +377,7 @@ public abstract class TileService {
 
             return _mapExtent.transform(DefaultGeographicCRS.WGS84, true);
 
-        } catch (TransformException e) {
-            throw new RuntimeException(e);
-        } catch (FactoryException e) {
+        } catch (TransformException | FactoryException e) {
             throw new RuntimeException(e);
         }
     }
